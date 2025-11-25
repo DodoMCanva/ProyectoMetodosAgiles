@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Experiencias Locales - Plataforma de Reservas</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div id="login-view" class="view active">
+        <div class="login-container">
+            <div class="login-box">
+                <div class="logo-section">
+                    <div class="logo-icon"></div>
+                    <h1>Experiencias Locales</h1>
+                    <p class="tagline">Descubre y reserva experiencias únicas en tu ciudad</p>
+                </div>
+
+                <div class="tabs">
+                    <button class="tab active" onclick="switchAuthTab('login')">Iniciar Sesión</button>
+                    <button class="tab" onclick="switchAuthTab('register')">Registrarse</button>
+                </div>
+
+                <div id="login-form" class="form-section">
+                    <form class="auth-form">
+                        <div class="form-group">
+                            <label>Correo Electrónico</label>
+                            <input type="email" placeholder="tu@correo.com">
+                        </div>
+                        <div class="form-group">
+                            <label>Contraseña</label>
+                            <input type="password" placeholder="••••••••">
+                        </div>
+                        <div class="form-group">
+                            <label>Tipo de Usuario</label>
+                            <select id="login-user-type">
+                                <option value="visitante">Visitante</option>
+                                <option value="proveedor">Proveedor</option>
+                                <option value="admin">Administrador</option>
+                            </select>
+                        </div>
+                        <button type="button" class="btn-primary" onclick="handleLogin()">Iniciar Sesión</button>
+                        <a href="#" class="link-forgot">¿Olvidaste tu contraseña?</a>
+                    </form>
+                </div>
+
+                <div id="register-form" class="form-section" style="display: none;">
+                    <form class="auth-form">
+                        <div class="form-group">
+                            <label>Nombre Completo</label>
+                            <input type="text" placeholder="Juan Pérez">
+                        </div>
+                        <div class="form-group">
+                            <label>Correo Electrónico</label>
+                            <input type="email" placeholder="tu@correo.com">
+                        </div>
+                        <div class="form-group">
+                            <label>Contraseña</label>
+                            <input type="password" placeholder="••••••••">
+                        </div>
+                        <div class="form-group">
+                            <label>Confirmar Contraseña</label>
+                            <input type="password" placeholder="••••••••">
+                        </div>
+                        <div class="form-group">
+                            <label>Tipo de Usuario</label>
+                            <select>
+                                <option value="visitante">Visitante</option>
+                                <option value="proveedor">Proveedor</option>
+                            </select>
+                        </div>
+                        <button type="button" class="btn-primary" onclick="handleRegister()">Crear Cuenta</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="experiencias-view" class="view">
+        <nav class="navbar">
+            <div class="nav-content">
+                <div class="nav-brand">
+                    <span class="nav-icon"></span>
+                    <span class="nav-title">Experiencias Locales</span>
+                </div>
+                <div class="nav-menu">
+                    <a href="#" class="nav-link active">Explorar</a>
+                    <a href="#" class="nav-link">Mis Reservas</a>
+                    <a href="#" class="nav-link">Mi Perfil</a>
+                    <button class="btn-logout" onclick="navigateTo('login-view')">Cerrar Sesión</button>
+                </div>
+            </div>
+        </nav>
+
+        <div class="content-wrapper">
+            <div class="hero-section">
+                <h1>Descubre Experiencias Únicas</h1>
+                <p>Conecta con la cultura local a través de experiencias auténticas</p>
+                
+                <div class="search-bar">
+                    <input type="text" placeholder="¿Qué experiencia buscas?">
+                    <button class="btn-search">Buscar</button>
+                </div>
+
+                <div class="filters">
+                    <button class="filter-chip active">Todas</button>
+                    <button class="filter-chip">Gastronómicas</button>
+                    <button class="filter-chip">Culturales</button>
+                    <button class="filter-chip">Artesanías</button>
+                    <button class="filter-chip">Recreativas</button>
+                    <button class="filter-chip">Tours</button>
+                </div>
+            </div>
+
+            <div class="experiences-grid">
+                <div class="experience-card" onclick="navigateTo('detalle-view')">
+                    <div class="card-image">
+                        <div class="card-emoji"></div>
+                        <span class="card-badge">Artesanías</span>
+                    </div>
+                    <div class="card-content">
+                        <h3>Taller de Cerámica Artesanal</h3>
+                        <p class="provider">Por María González</p>
+                        <div class="card-info">
+                            <span class="info-item">Centro Histórico</span>
+                            <span class="info-item">15 Dic 2025</span>
+                            <span class="info-item">5 cupos</span>
+                        </div>
+                        <div class="card-footer">
+                            <div class="rating">
+                                <span class="star"></span>
+                                <span>4.9</span>
+                                <span class="reviews">(127)</span>
+                            </div>
+                            <div class="price">$450</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="experience-card" onclick="navigateTo('detalle-view')">
+                    <div class="card-image" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                        <div class="card-emoji"></div>
+                        <span class="card-badge">Gastronómicas</span>
+                    </div>
+                    <div class="card-content">
+                        <h3>Tour Gastronómico Nocturno</h3>
+                        <p class="provider">Por Chef Roberto Díaz</p>
+                        <div class="card-info">
+                            <span class="info-item">Zona Rosa</span>
+                            <span class="info-item">18 Dic 2025</span>
+                            <span class="info-item">8 cupos</span>
+                        </div>
+                        <div class="card-footer">
+                            <div class="rating">
+                                <span class="star"></span>
+                                <span>5.0</span>
+                                <span class="reviews">(203)</span>
+                            </div>
+                            <div class="price">$890</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="experience-card" onclick="navigateTo('detalle-view')">
+                    <div class="card-image" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                        <div class="card-emoji"></div>
+                        <span class="card-badge">Culturales</span>
+                    </div>
+                    <div class="card-content">
+                        <h3>Clase de Baile Folklórico</h3>
+                        <p class="provider">Por Grupo Tradiciones</p>
+                        <div class="card-info">
+                            <span class="info-item">Casa de la Cultura</span>
+                            <span class="info-item">20 Dic 2025</span>
+                            <span class="info-item">12 cupos</span>
+                        </div>
+                        <div class="card-footer">
+                            <div class="rating">
+                                <span class="star"></span>
+                                <span>4.8</span>
+                                <span class="reviews">(89)</span>
+                            </div>
+                            <div class="price">$350</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="experience-card" onclick="navigateTo('detalle-view')">
+                    <div class="card-image" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+                        <div class="card-emoji"></div>
+                        <span class="card-badge">Tours</span>
+                    </div>
+                    <div class="card-content">
+                        <h3>Recorrido Histórico a Pie</h3>
+                        <p class="provider">Por Guía Luis Martínez</p>
+                        <div class="card-info">
+                            <span class="info-item">Centro</span>
+                            <span class="info-item">22 Dic 2025</span>
+                            <span class="info-item">15 cupos</span>
+                        </div>
+                        <div class="card-footer">
+                            <div class="rating">
+                                <span class="star"></span>
+                                <span>4.7</span>
+                                <span class="reviews">(156)</span>
+                            </div>
+                            <div class="price">$200</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="experience-card" onclick="navigateTo('detalle-view')">
+                    <div class="card-image" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
+                        <div class="card-emoji"></div>
+                        <span class="card-badge">Artesanías</span>
+                    </div>
+                    <div class="card-content">
+                        <h3>Taller de Pintura Tradicional</h3>
+                        <p class="provider">Por Ana Flores</p>
+                        <div class="card-info">
+                            <span class="info-item">Galería Arte Vivo</span>
+                            <span class="info-item">25 Dic 2025</span>
+                            <span class="info-item">6 cupos</span>
+                        </div>
+                        <div class="card-footer">
+                            <div class="rating">
+                                <span class="star"></span>
+                                <span>4.9</span>
+                                <span class="reviews">(74)</span>
+                            </div>
+                            <div class="price">$520</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="experience-card" onclick="navigateTo('detalle-view')">
+                    <div class="card-image" style="background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);">
+                        <div class="card-emoji"></div>
+                        <span class="card-badge">Gastronómicas</span>
+                    </div>
+                    <div class="card-content">
+                        <h3>Experiencia Culinaria: Cocina Local</h3>
+                        <p class="provider">Por Cocina Abuela Rosa</p>
+                        <div class="card-info">
+                            <span class="info-item">Barrio Antiguo</span>
+                            <span class="info-item">28 Dic 2025</span>
+                            <span class="info-item">10 cupos</span>
+                        </div>
+                        <div class="card-footer">
+                            <div class="rating">
+                                <span class="star"></span>
+                                <span>5.0</span>
+                                <span class="reviews">(198)</span>
+                            </div>
+                            <div class="price">$680</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="detalle-view" class="view">
+        <nav class="navbar">
+            <div class="nav-content">
+                <div class="nav-brand">
+                    <span class="nav-icon"></span>
+                    <span class="nav-title">Experiencias Locales</span>
+                </div>
+                <div class="nav-menu">
+                    <a href="#" class="nav-link" onclick="navigateTo('experiencias-view')">← Volver</a>
+                    <button class="btn-logout" onclick="navigateTo('login-view')">Cerrar Sesión</button>
+                </div>
+            </div>
+        </nav>
+
+        <div class="detail-container">
+            <div class="detail-header">
+                <div class="detail-image">
+                    <div class="detail-emoji"></div>
+                </div>
+                <div class="detail-info">
+                    <div class="badge-status">Aprobada</div>
+                    <h1>Taller de Cerámica Artesanal</h1>
+                    <p class="provider-name">Por María González</p>
+                    <div class="detail-rating">
+                        <span class="star"></span>
+                        <span>4.9</span>
+                        <span class="reviews">(127 reseñas)</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="detail-content">
+                <div class="detail-main">
+                    <section class="detail-section">
+                        <h2>Descripción</h2>
+                        <p>Sumérgete en el arte milenario de la cerámica en este taller práctico. Aprenderás las técnicas básicas de modelado, decoración y esmaltado. Trabajarás con arcilla de alta calidad y crearás tu propia pieza única para llevar a casa. Ideal para principiantes y entusiastas del arte.</p>
+                    </section>
+
+                    <section class="detail-section">
+                        <h2>Detalles de la Experiencia</h2>
+                        <div class="details-grid">
+                            <div class="detail-item">
+                                <span class="detail-icon"></span>
+                                <div>
+                                    <strong>Fecha</strong>
+                                    <p>15 de Diciembre, 2025</p>
+                                </div>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-icon"></span>
+                                <div>
+                                    <strong>Horario</strong>
+                                    <p>10:00 AM - 2:00 PM</p>
+                                </div>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-icon"></span>
+                                <div>
+                                    <strong>Ubicación</strong>
+                                    <p>Centro Histórico, Calle Artesanos #45</p>
+                                </div>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-icon"></span>
+                                <div>
+                                    <strong>Cupos Disponibles</strong>
+                                    <p>5 de 10 lugares</p>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="detail-section">
+                        <h2>¿Qué incluye?</h2>
+                        <ul class="includes-list">
+                            <li>Todos los materiales (arcilla, herramientas, esmaltes)</li>
+                            <li>Instrucción personalizada</li>
+                            <li>Refrigerio ligero</li>
+                            <li>Tu pieza terminada para llevar</li>
+                            <li>Certificado de participación</li>
+                        </ul>
+                    </section>
+
+                    <section class="detail-section">
+                        <h2>Reseñas</h2>
+                        <div class="reviews-list">
+                            <div class="review-item">
+                                <div class="review-header">
+                                    <div class="review-avatar">JP</div>
+                                    <div>
+                                        <strong>Juan Pérez</strong>
+                                        <div class="review-rating">5/5</div>
+                                    </div>
+                                </div>
+                                <p>"Experiencia increíble. María es una excelente instructora y el ambiente es muy agradable. ¡Volveré sin duda!"</p>
+                            </div>
+                            <div class="review-item">
+                                <div class="review-header">
+                                    <div class="review-avatar">AL</div>
+                                    <div>
+                                        <strong>Ana López</strong>
+                                        <div class="review-rating">5/5</div>
+                                    </div>
+                                </div>
+                                <p>"Perfecto para desconectar y aprender algo nuevo. La pieza que hice quedó hermosa."</p>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+
+                <div class="detail-sidebar">
+                    <div class="booking-card">
+                        <div class="booking-price">
+                            <span class="price-amount">$450</span>
+                            <span class="price-label">por persona</span>
+                        </div>
+
+                        <div class="booking-form">
+                            <div class="form-group">
+                                <label>Número de personas</label>
+                                <select>
+                                    <option>1 persona</option>
+                                    <option>2 personas</option>
+                                    <option>3 personas</option>
+                                    <option>4 personas</option>
+                                    <option>5 personas</option>
+                                </select>
+                            </div>
+
+                            <div class="booking-summary">
+                                <div class="summary-row">
+                                    <span>$450 x 1 persona</span>
+                                    <span>$450</span>
+                                </div>
+                                <div class="summary-row">
+                                    <span>Tarifa de servicio</span>
+                                    <span>$45</span>
+                                </div>
+                                <div class="summary-row total">
+                                    <strong>Total</strong>
+                                    <strong>$495</strong>
+                                </div>
+                            </div>
+
+                            <button class="btn-book" onclick="navigateTo('pago-view')">Reservar Ahora</button>
+                            <p class="booking-note">No se te cobrará todavía</p>
+                        </div>
+                    </div>
+
+                    <div class="provider-card">
+                        <h3>Acerca del Proveedor</h3>
+                        <div class="provider-info-detail">
+                            <div class="provider-avatar">MG</div>
+                            <div>
+                                <strong>María González</strong>
+                                <p>Artesana certificada</p>
+                            </div>
+                        </div>
+                        <p>Con más de 15 años de experiencia en cerámica artesanal, María ha enseñado a cientos de personas este hermoso arte.</p>
+                        <button class="btn-secondary">Contactar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="pago-view" class="view">
+        <nav class="navbar">
+            <div class="nav-content">
+                <div class="nav-brand">
+                    <span class="nav-icon"></span>
+                    <span class="nav-title">Experiencias Locales</span>
+                </div>
+            </div>
+        </nav>
+
+        <div class="payment-container">
+            <div class="payment-progress">
+                <div class="progress-step completed">
+                    <div class="step-circle">1</div>
+                    <span>Experiencia</span>
+                </div>
+                <div class="progress-line completed"></div>
+                <div class="progress-step active">
+                    <div class="step-circle">2</div>
+                    <span>Pago</span>
+                </div>
+                <div class="progress-line"></div>
+                <div class="progress-step">
+                    <div class="step-circle">3</div>
+                    <span>Confirmación</span>
+                </div>
+            </div>
+
+            <div class="payment-content">
+                <div class="payment-main">
+                    <h1>Información de Pago</h1>
+                    
+                    <div class="payment-methods">
+                        <button class="payment-method active">
+                            <span class="method-icon"></span>
+                            <span>Tarjeta de Crédito/Débito</span>
+                        </button>
+                        <button class="payment-method">
+                            <span class="method-icon"></span>
+                            <span>PayPal</span>
+                        </button>
+                    </div>
+
+                    <form class="payment-form">
+                        <div class="form-group">
+                            <label>Número de Tarjeta</label>
+                            <input type="text" placeholder="1234 5678 9012 3456" maxlength="19">
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Fecha de Vencimiento</label>
+                                <input type="text" placeholder="MM/AA" maxlength="5">
+                            </div>
+                            <div class="form-group">
+                                <label>CVV</label>
+                                <input type="text" placeholder="123" maxlength="3">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Nombre en la Tarjeta</label>
+                            <input type="text" placeholder="JUAN PEREZ">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Correo Electrónico</label>
+                            <input type="email" placeholder="tu@correo.com">
+                        </div>
+
+                        <div class="security-note">
+                            <span class="security-icon"></span>
+                            <p>Tus datos de pago están protegidos con encriptación de nivel bancario</p>
+                        </div>
+
+                        <button type="button" class="btn-pay" onclick="navigateTo('confirmacion-view')">
+                            Pagar $495
+                        </button>
+                    </form>
+                </div>
+
+                <div class="payment-summary">
+                    <h2>Resumen de Reserva</h2>
+                    <div class="summary-card">
+                        <div class="summary-experience">
+                            <div class="summary-emoji"></div>
+                            <div>
+                                <h3>Taller de Cerámica Artesanal</h3>
+                                <p>Por María González</p>
+                            </div>
+                        </div>
+
+                        <div class="summary-details">
+                            <div class="summary-detail">
+                                <span class="detail-label">Fecha:</span>
+                                <span>15 Dic 2025</span>
+                            </div>
+                            <div class="summary-detail">
+                                <span class="detail-label">Hora:</span>
+                                <span>10:00 AM</span>
+                            </div>
+                            <div class="summary-detail">
+                                <span class="detail-label">Personas:</span>
+                                <span>1</span>
+                            </div>
+                            <div class="summary-detail">
+                                <span class="detail-label">Ubicación:</span>
+                                <span>Centro Histórico</span>
+                            </div>
+                        </div>
+
+                        <div class="summary-pricing">
+                            <div class="pricing-row">
+                                <span>$450 x 1</span>
+                                <span>$450</span>
+                            </div>
+                            <div class="pricing-row">
+                                <span>Tarifa de servicio</span>
+                                <span>$45</span>
+                            </div>
+                            <div class="pricing-row total">
+                                <strong>Total</strong>
+                                <strong>$495</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="confirmacion-view" class="view">
+        <nav class="navbar">
+            <div class="nav-content">
+                <div class="nav-brand">
+                    <span class="nav-icon"></span>
+                    <span class="nav-title">Experiencias Locales</span>
+                </div>
+            </div>
+        </nav>
+
+        <div class="confirmation-container">
+            <div class="confirmation-content">
+                <div class="success-icon"></div>
+                <h1>¡Reserva Confirmada!</h1>
+                <p class="confirmation-message">Tu experiencia ha sido reservada exitosamente</p>
+
+                <div class="confirmation-card">
+                    <h2>Detalles de tu Reserva</h2>
+                    <div class="confirmation-number">
+                        <span class="label">Número de Confirmación:</span>
+                        <span class="number">#EXP-2025-001234</span>
+                    </div>
+
+                    <div class="confirmation-experience">
+                        <div class="exp-emoji"></div>
+                        <div>
+                            <h3>Taller de Cerámica Artesanal</h3>
+                            <p>Por María González</p>
+                        </div>
+                    </div>
+
+                    <div class="confirmation-details">
+                        <div class="conf-detail">
+                            <span class="icon"></span>
+                            <div>
+                                <strong>Fecha</strong>
+                                <p>15 de Diciembre, 2025</p>
+                            </div>
+                        </div>
+                        <div class="conf-detail">
+                            <span class="icon"></span>
+                            <div>
+                                <strong>Hora</strong>
+                                <p>10:00 AM - 2:00 PM</p>
+                            </div>
+                        </div>
+                        <div class="conf-detail">
+                            <span class="icon"></span>
+                            <div>
+                                <strong>Ubicación</strong>
+                                <p>Centro Histórico, Calle Artesanos #45</p>
+                            </div>
+                        </div>
+                        <div class="conf-detail">
+                            <span class="icon"></span>
+                            <div>
+                                <strong>Personas</strong>
+                                <p>1 persona</p>
+                            </div>
+                        </div>
+                        <div class="conf-detail">
+                            <span class="icon"></span>
+                            <div>
+                                <strong>Total Pagado</strong>
+                                <p>$495 MXN</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="confirmation-note">
+                        <span class="note-icon"></span>
+                        <p>Hemos enviado los detalles de tu reserva a tu correo electrónico</p>
+                    </div>
+                </div>
+
+                <div class="confirmation-actions">
+                    <button class="btn-primary" onclick="navigateTo('experiencias-view')">
+                        Explorar Más Experiencias
+                    </button>
+                    <button class="btn-secondary">
+                        Ver Mis Reservas
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="proveedor-view" class="view">
+        <nav class="navbar">
+            <div class="nav-content">
+                <div class="nav-brand">
+                    <span class="nav-icon"></span>
+                    <span class="nav-title">Experiencias Locales - Proveedor</span>
+                </div>
+                <div class="nav-menu">
+                    <a href="#" class="nav-link active">Mis Experiencias</a>
+                    <a href="#" class="nav-link">Reservas</a>
+                    <a href="#" class="nav-link">Estadísticas</a>
+                    <button class="btn-logout" onclick="navigateTo('login-view')">Cerrar Sesión</button>
+                </div>
+            </div>
+        </nav>
+
+        <div class="dashboard-container">
+            <div class="dashboard-header">
+                <div>
+                    <h1>Mis Experiencias</h1>
+                    <p>Gestiona y actualiza tus experiencias publicadas</p>
+                </div>
+                <button class="btn-primary" onclick="navigateTo('crear-experiencia-view')">
+                    + Nueva Experiencia
+                </button>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon"></div>
+                    <div class="stat-content">
+                        <span class="stat-value">12</span>
+                        <span class="stat-label">Experiencias Activas</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"></div>
+                    <div class="stat-content">
+                        <span class="stat-value">48</span>
+                        <span class="stat-label">Reservas del Mes</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"></div>
+                    <div class="stat-content">
+                        <span class="stat-value">4.9</span>
+                        <span class="stat-label">Calificación Promedio</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"></div>
+                    <div class="stat-content">
+                        <span class="stat-value">$12,450</span>
+                        <span class="stat-label">Ingresos del Mes</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="provider-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Experiencia</th>
+                            <th>Estado</th>
+                            <th>Fecha</th>
+                            <th>Cupos</th>
+                            <th>Precio</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <div class="table-experience">
+                                    <span class="table-emoji"></span>
+                                    <span>Taller de Cerámica Artesanal</span>
+                                </div>
+                            </td>
+                            <td><span class="status-badge approved">Aprobada</span></td>
+                            <td>15 Dic 2025</td>
+                            <td>5/10</td>
+                            <td>$450</td>
+                            <td>
+                                <div class="table-actions">
+                                    <button class="btn-icon" title="Editar">Editar</button>
+                                    <button class="btn-icon" title="Ver">Ver</button>
+                                    <button class="btn-icon" title="Eliminar">Eliminar</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="table-experience">
+                                    <span class="table-emoji"></span>
+                                    <span>Taller de Pintura Tradicional</span>
+                                </div>
+                            </td>
+                            <td><span class="status-badge approved">Aprobada</span></td>
+                            <td>25 Dic 2025</td>
+                            <td>6/8</td>
+                            <td>$520</td>
+                            <td>
+                                <div class="table-actions">
+                                    <button class="btn-icon" title="Editar">Editar</button>
+                                    <button class="btn-icon" title="Ver">Ver</button>
+                                    <button class="btn-icon" title="Eliminar">Eliminar</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="table-experience">
+                                    <span class="table-emoji"></span>
+                                    <span>Clase de Tejido Artesanal</span>
+                                </div>
+                            </td>
+                            <td><span class="status-badge pending">Pendiente</span></td>
+                            <td>30 Dic 2025</td>
+                            <td>0/12</td>
+                            <td>$380</td>
+                            <td>
+                                <div class="table-actions">
+                                    <button class="btn-icon" title="Editar">Editar</button>
+                                    <button class="btn-icon" title="Ver">Ver</button>
+                                    <button class="btn-icon" title="Eliminar">Eliminar</button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="crear-experiencia-view" class="view">
+        <nav class="navbar">
+            <div class="nav-content">
+                <div class="nav-brand">
+                    <span class="nav-icon"></span>
+                    <span class="nav-title">Experiencias Locales</span>
+                </div>
+                <div class="nav-menu">
+                    <a href="#" class="nav-link" onclick="navigateTo('proveedor-view')">← Volver</a>
+                    <button class="btn-logout" onclick="navigateTo('login-view')">Cerrar Sesión</button>
+                </div>
+            </div>
+        </nav>
+
+        <div class="form-container">
+            <h1>Crear Nueva Experiencia</h1>
+            <p class="form-subtitle">Completa la información de tu experiencia</p>
+
+            <form class="create-experience-form">
+                <div class="form-section-title">Información Básica</div>
+                
+                <div class="form-group">
+                    <label>Nombre de la Experiencia *</label>
+                    <input type="text" placeholder="Ej: Taller de Cerámica Artesanal">
+                </div>
+
+                <div class="form-group">
+                    <label>Categoría *</label>
+                    <select>
+                        <option value="">Selecciona una categoría</option>
+                        <option>Gastronómica</option>
+                        <option>Cultural</option>
+                        <option>Artesanías</option>
+                        <option>Recreativa</option>
+                        <option>Tours</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Descripción *</label>
+                    <textarea rows="6" placeholder="Describe tu experiencia en detalle..."></textarea>
+                    <span class="field-hint">Mínimo 100 caracteres</span>
+                </div>
+
+                <div class="form-section-title">Detalles de la Experiencia</div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Fecha *</label>
+                        <input type="date">
+                    </div>
+                    <div class="form-group">
+                        <label>Hora de Inicio *</label>
+                        <input type="time">
+                    </div>
+                    <div class="form-group">
+                        <label>Hora de Fin *</label>
+                        <input type="time">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Precio (MXN) *</label>
+                        <input type="number" placeholder="450">
+                    </div>
+                    <div class="form-group">
+                        <label>Cupos Disponibles *</label>
+                        <input type="number" placeholder="10">
+                    </div>
+                </div>
+
+                <div class="form-section-title">Ubicación</div>
+
+                <div class="form-group">
+                    <label>Dirección Completa *</label>
+                    <input type="text" placeholder="Calle, número, colonia">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Ciudad *</label>
+                        <input type="text" placeholder="Ciudad">
+                    </div>
+                    <div class="form-group">
+                        <label>Estado *</label>
+                        <input type="text" placeholder="Estado">
+                    </div>
+                    <div class="form-group">
+                        <label>Código Postal *</label>
+                        <input type="text" placeholder="00000">
+                    </div>
+                </div>
+
+                <div class="form-section-title">Información Adicional</div>
+
+                <div class="form-group">
+                    <label>¿Qué incluye? *</label>
+                    <textarea rows="4" placeholder="Lista lo que incluye tu experiencia (materiales, comida, etc.)"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Requisitos o Recomendaciones</label>
+                    <textarea rows="3" placeholder="Indica si hay requisitos especiales o recomendaciones"></textarea>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" onclick="navigateTo('proveedor-view')">
+                        Cancelar
+                    </button>
+                    <button type="button" class="btn-primary" onclick="navigateTo('proveedor-view')">
+                        Publicar Experiencia
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="admin-view" class="view">
+        <nav class="navbar navbar-admin">
+            <div class="nav-content">
+                <div class="nav-brand">
+                    <span class="nav-icon"></span>
+                    <span class="nav-title">Panel de Administración</span>
+                </div>
+                <div class="nav-menu">
+                    <a href="#" class="nav-link active">Experiencias</a>
+                    <a href="#" class="nav-link">Usuarios</a>
+                    <a href="#" class="nav-link">Reportes</a>
+                    <button class="btn-logout" onclick="navigateTo('login-view')">Cerrar Sesión</button>
+                </div>
+            </div>
+        </nav>
+
+        <div class="dashboard-container">
+            <div class="dashboard-header">
+                <div>
+                    <h1>Gestión de Experiencias</h1>
+                    <p>Revisa, aprueba o suspende experiencias publicadas</p>
+                </div>
+            </div>
+
+            <div class="admin-filters">
+                <button class="filter-btn active">Todas (24)</button>
+                <button class="filter-btn">Pendientes (8)</button>
+                <button class="filter-btn">Aprobadas (14)</button>
+                <button class="filter-btn">Suspendidas (2)</button>
+            </div>
+
+            <div class="admin-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Experiencia</th>
+                            <th>Proveedor</th>
+                            <th>Categoría</th>
+                            <th>Fecha</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <div class="table-experience">
+                                    <span class="table-emoji"></span>
+                                    <span>Clase de Tejido Artesanal</span>
+                                </div>
+                            </td>
+                            <td>María González</td>
+                            <td>Artesanías</td>
+                            <td>30 Dic 2025</td>
+                            <td><span class="status-badge pending">Pendiente</span></td>
+                            <td>
+                                <div class="table-actions">
+                                    <button class="btn-approve" title="Aprobar">Aprobar</button>
+                                    <button class="btn-reject" title="Rechazar">Rechazar</button>
+                                    <button class="btn-icon" title="Ver">Ver</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="table-experience">
+                                    <span class="table-emoji"></span>
+                                    <span>Cata de Vinos Locales</span>
+                                </div>
+                            </td>
+                            <td>Roberto Díaz</td>
+                            <td>Gastronómica</td>
+                            <td>28 Dic 2025</td>
+                            <td><span class="status-badge pending">Pendiente</span></td>
+                            <td>
+                                <div class="table-actions">
+                                    <button class="btn-approve" title="Aprobar">Aprobar</button>
+                                    <button class="btn-reject" title="Rechazar">Rechazar</button>
+                                    <button class="btn-icon" title="Ver">Ver</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="table-experience">
+                                    <span class="table-emoji"></span>
+                                    <span>Taller de Cerámica Artesanal</span>
+                                </div>
+                            </td>
+                            <td>María González</td>
+                            <td>Artesanías</td>
+                            <td>15 Dic 2025</td>
+                            <td><span class="status-badge approved">Aprobada</span></td>
+                            <td>
+                                <div class="table-actions">
+                                    <button class="btn-suspend" title="Suspender">Suspender</button>
+                                    <button class="btn-icon" title="Ver">Ver</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="table-experience">
+                                    <span class="table-emoji"></span>
+                                    <span>Tour Gastronómico Nocturno</span>
+                                </div>
+                            </td>
+                            <td>Chef Roberto Díaz</td>
+                            <td>Gastronómica</td>
+                            <td>18 Dic 2025</td>
+                            <td><span class="status-badge approved">Aprobada</span></td>
+                            <td>
+                                <div class="table-actions">
+                                    <button class="btn-suspend" title="Suspender">Suspender</button>
+                                    <button class="btn-icon" title="Ver">Ver</button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/script.js"></script>
+</body>
+</html>
