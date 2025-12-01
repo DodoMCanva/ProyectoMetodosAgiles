@@ -1,13 +1,16 @@
 // --- VARIABLES GLOBALES ---
-let usuarioActualEmail = '';
+let usuarioActualEmail = localStorage.getItem('email');
 let experienciaSeleccionada = {};
-
-if (!localStorage.getItem('email')) {
-    alert('Iniciar Sesion');
-    window.location.href = 'index.html';
-} else {
-    usuarioActualEmail = localStorage.getItem('email');
+function validarSesion() {
+    if (!localStorage.getItem('email')) {
+        alert('Iniciar Sesion');
+        window.location.href = 'index.html';
+    } else {
+        usuarioActualEmail = localStorage.getItem('email');
+    }
 }
+
+validarSesion()
 
 // --- NAVEGACIÓN ---
 function navigateTo(viewId) {
@@ -63,23 +66,27 @@ function prepararPago() {
 
 // Paso 3: Procesar pago y guardar en Base de Datos
 async function procesarPago() {
-    const datosReserva = {
+    validarSesion();
+    const datosPago = {
         usuarioEmail: usuarioActualEmail,
-        ...experienciaSeleccionada
+        propietario: document.getElementById('propietario-text').value,
+        tarjeta: document.getElementById('tarjeta-text').value,
+        cvv: document.getElementById('cvv-pass').value,
+        vencimiento: document.getElementById('vencimiento-text').value
     };
 
     try {
-        const res = await fetch('/api/reservar', {
+        const res = await fetch('/api/pagar-experiencia', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(datosReserva)
+            body: JSON.stringify(datosPago)
         });
         const data = await res.json();
 
         if (data.success) {
-            // Mostrar ID de reserva
-            document.getElementById('conf-id').innerText = data.reservaId;
-            navigateTo('confirmacion-view');
+            // Generar y Mostrar ID de reserva
+            //document.getElementById('conf-id').innerText = data.reservaId;
+            //navigateTo('confirmacion-view');
         } else {
             alert('Error al reservar: ' + data.message);
         }
@@ -88,6 +95,7 @@ async function procesarPago() {
         alert('Error procesando pago');
     }
 }
+
 
 // Inicializar
 document.addEventListener('DOMContentLoaded', () => {

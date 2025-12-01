@@ -123,8 +123,34 @@ app.post('/api/registrar-experiencias', async (req, res) => {
     }
 });
 
-app.get('/api/pagar-experiencia', async (req, res) => {
+app.post('/api/pagar-experiencia', async (req, res) => {
+    try {
+        const { usuarioEmail, propietario, tarjeta, cvv, vencimiento } = req.body;
 
+        if (!usuarioEmail || !propietario || !tarjeta || !cvv || !vencimiento) {
+            return res.status(400).json({
+                success: false,
+                message: 'Faltan datos obligatorios para procesar el pago'
+            });
+        }
+
+        if (!usuarioEmail.includes('@')) {
+            return res.status(400).json({ success: false, message: 'Email inválido' });
+        }
+
+        if (tarjeta.length < 13 || tarjeta.length > 19) {
+            return res.status(400).json({ success: false, message: 'Número de tarjeta inválido' });
+        }
+
+        if (cvv.length < 3 || cvv.length > 4) {
+            return res.status(400).json({ success: false, message: 'CVV inválido' });
+        }
+
+        res.json({ success: true, message: 'Experiencia pagada' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: 'No se pudo pagar la experiencia' });
+    }
 });
 
 app.get('/api/cargar-experiencias', async (req, res) => {

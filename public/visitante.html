@@ -109,8 +109,14 @@
                     <h1>Resumen de Pago</h1>
                     <div class="payment-form">
                         <div class="form-group">
-                            <label>Número de Tarjeta (Simulado)</label>
-                            <input type="text" placeholder="1234 5678 9012 3456">
+                            <label>Propietario</label>
+                            <input id="propietario-text" type="text" placeholder="Nombre completo">
+                            <label>Número de Tarjeta</label>
+                            <input id="tarjeta-text" type="text" placeholder="1234 5678 9012 3456">
+                            <label>CVV</label>
+                            <input id="cvv-pass" type="password" placeholder="***">
+                            <label>Vencimiento</label>
+                            <input id="vencimiento-text" type="text" placeholder="27/09">
                         </div>
                         <button type="button" class="btn-pay" onclick="procesarPago()">Pagar Total</button>
                     </div>
