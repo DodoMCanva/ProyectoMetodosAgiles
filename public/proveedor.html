@@ -168,6 +168,61 @@
         <div class="dashboard-container">
             <h1>Bienvenido Proveedor</h1>
             <p>Aquí gestionarías tus experiencias.</p>
+
+            <section class="create-experience-section">
+                <div class="create-header">
+                    <h2>Crear Nueva Experiencia</h2>
+                    <button id="btn-open-create" class="btn-primary" onclick="openCreateExperienceForm()">Crear experiencia</button>
+                </div>
+
+                <form id="create-experience-form" class="create-form" style="display:none; margin-top:16px;">
+                    <div class="form-group">
+                        <label for="exp-nombre">Nombre</label>
+                        <input id="exp-nombre" type="text" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="exp-descripcion">Descripción</label>
+                        <textarea id="exp-descripcion" rows="4" required></textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="exp-fecha">Fecha</label>
+                            <input id="exp-fecha" type="date" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="exp-cupo">Cupo</label>
+                            <input id="exp-cupo" type="number" min="1" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="exp-precio">Precio (MXN)</label>
+                            <input id="exp-precio" type="number" step="0.01" min="0" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="exp-ubicacion">Ubicación</label>
+                            <input id="exp-ubicacion" type="text" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="exp-imagen">Imagen (URL, opcional)</label>
+                        <input id="exp-imagen" type="text" placeholder="https://...">
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn-secondary" onclick="closeCreateExperienceForm()">Cancelar</button>
+                        <button type="button" class="btn-primary" onclick="handleCreateExperienceSubmit()">Guardar experiencia</button>
+                    </div>
+                    <div id="create-feedback" style="margin-top:8px;color:green;display:none;"></div>
+                </form>
+
+                <div id="mis-experiencias" style="margin-top:24px;">
+                    <h3>Mis experiencias</h3>
+                    <div id="experiencias-list" class="experiences-list">
+                        <!-- Lista renderizada por JS -->
+                    </div>
+                </div>
+            </section>
         </div>
     </div>
 
