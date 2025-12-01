@@ -22,6 +22,23 @@ const UsuarioSchema = new mongoose.Schema({
     password: String,
     rol: { type: String, default: 'visitante' }
 });
+
+const ExperienciaSchema = new mongoose.Schema({
+    nombre: { type: String, required: true },
+    descripcion: { type: String, required: true },
+    fecha: { type: Date, required: true },
+    cupo: { type: Number, required: true },
+    precio: { type: Number, required: true },
+    ubicacion: { type: String, required: true },
+
+    proveedor: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Usuario',
+        required: true
+    }
+});
+
+const Experiencia = mongoose.model('Experiencia', ExperienciaSchema);
 const Usuario = mongoose.model('Usuario', UsuarioSchema);
 
 // Ruta para crear datos de prueba iniciales
@@ -83,6 +100,43 @@ app.post('/api/register', async (req, res) => {
         res.status(500).json({ success: false, message: 'Error al registrar usuario' });
     }
 });
+
+app.post('/api/registrar-experiencias', async (req, res) => {
+    try {
+        const { nombre, descripcion, fecha, cupo, precio, ubicacion, proveedorId } = req.body;
+
+        const nuevaExp = new Experiencia({
+            nombre,
+            descripcion,
+            fecha,
+            cupo,
+            precio,
+            ubicacion,
+            proveedor: proveedorId
+        });
+
+        await nuevaExp.save();
+        res.json({ success: true, message: 'Experiencia creada', experiencia: nuevaExp });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: 'Error al crear experiencia' });
+    }
+});
+
+app.get('/api/pagar-experiencia', async (req, res) => {
+
+});
+
+app.get('/api/cargar-experiencias', async (req, res) => {
+    try {
+        const experiencias = await Experiencia.find({});
+        res.json(experiencias);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: 'Error al obtener experiencias' });
+    }
+});
+
 
 // --- RUTA DE VERIFICACIÓN (Solo para pruebas) ---
 app.get('/api/ver-usuarios', async (req, res) => {
