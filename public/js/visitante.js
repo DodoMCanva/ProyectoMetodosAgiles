@@ -1,9 +1,13 @@
 // --- VARIABLES GLOBALES ---
-let usuarioActualEmail = '';
+let usuarioActualEmail = localStorage.getItem('email');
 let experienciaSeleccionada = {};
-
 // --- NAVEGACIÓN ---
 function navigateTo(viewId) {
+    if (viewId === "login-view") {
+        localStorage.clear();
+        window.location.href = "index.html";
+        return;
+    }
     // Ocultar todas las vistas
     document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
     // Mostrar la vista deseada
@@ -29,79 +33,6 @@ function switchAuthTab(tab) {
         registerForm.style.display = 'block';
         tabs[0].classList.remove('active');
         tabs[1].classList.add('active');
-    }
-}
-
-// --- AUTENTICACIÓN ---
-async function handleLogin() {
-    const emailInput = document.querySelector('#login-form input[type="email"]');
-    const passInput = document.querySelector('#login-form input[type="password"]');
-    
-    const email = emailInput.value;
-    const password = passInput.value;
-
-    if (!email || !password) {
-        alert("Ingresa correo y contraseña");
-        return;
-    }
-
-    try {
-        const res = await fetch('/api/login', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ email, password })
-        });
-        const data = await res.json();
-
-        if (data.success) {
-            // Guardamos el email para poder reservar después
-            usuarioActualEmail = email;
-            alert('Bienvenido ' + data.nombre);
-            
-            // Redirección por rol
-            if (data.rol === 'admin') navigateTo('admin-view');
-            else if (data.rol === 'proveedor') navigateTo('proveedor-view');
-            else navigateTo('experiencias-view');
-        } else {
-            alert(data.message);
-        }
-    } catch (e) {
-        console.error(e);
-        alert('Error de conexión');
-    }
-}
-
-async function handleRegister() {
-    const container = document.getElementById('register-form');
-    // Obtenemos los valores de los inputs dentro del formulario de registro
-    const nombre = container.querySelector('input[placeholder="Tu Nombre"]').value;
-    const email = container.querySelector('input[placeholder="tu@correo.com"]').value;
-    // Buscamos todos los passwords en el registro (el primero es pass, el segundo confirmar)
-    const inputsPass = container.querySelectorAll('input[type="password"]');
-    const pass = inputsPass[0].value;
-    const confirm = inputsPass[1].value;
-    const rol = container.querySelector('select').value;
-
-    if (!nombre || !email || !pass) return alert("Completa los campos");
-    if (pass !== confirm) return alert("Las contraseñas no coinciden");
-
-    try {
-        const res = await fetch('/api/register', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ nombre, email, password: pass, rol })
-        });
-        const data = await res.json();
-        
-        if (data.success) {
-            alert('Cuenta creada. Inicia sesión.');
-            switchAuthTab('login');
-        } else {
-            alert(data.message);
-        }
-    } catch (e) {
-        console.error(e);
-        alert('Error de registro');
     }
 }
 
@@ -150,7 +81,7 @@ async function procesarPago() {
     try {
         const res = await fetch('/api/reservar', {
             method: 'POST',
-            headers: {'Content-Type': 'application/json'},
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(datosReserva)
         });
         const data = await res.json();
@@ -171,5 +102,5 @@ async function procesarPago() {
 // Inicializar
 document.addEventListener('DOMContentLoaded', () => {
     // Al cargar la página, mandamos al login
-    navigateTo('login-view');
+    navigateTo('experiencias-view');
 });

@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Experiencias Locales</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div id="experiencias-view" class="view active">
+        <nav class="navbar">
+            <div class="nav-content">
+                <div class="nav-brand">Experiencias Locales</div>
+                <div class="nav-menu">
+                    <button class="btn-logout" onclick="navigateTo('login-view')">Salir</button>
+                </div>
+            </div>
+        </nav>
+        <div class="content-wrapper">
+            <div class="hero-section">
+                <h1>Explora Experiencias</h1>
+                <p>Selecciona una actividad para ver detalles</p>
+            </div>
+            <div class="experiences-grid">
+                <div class="experience-card" onclick="seleccionarExperiencia('Taller de Cerámica', 'María González', 450, '15 Dic 2025')">
+                    <div class="card-image">
+                        <div class="card-emoji">🏺</div>
+                        <span class="card-badge">Artesanías</span>
+                    </div>
+                    <div class="card-content">
+                        <h3>Taller de Cerámica</h3>
+                        <p class="provider">Por María González</p>
+                        <div class="card-footer">
+                            <div class="price">$450</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="experience-card" onclick="seleccionarExperiencia('Tour Gastronómico', 'Chef Roberto', 890, '18 Dic 2025')">
+                    <div class="card-image" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                        <div class="card-emoji">🌮</div>
+                        <span class="card-badge">Comida</span>
+                    </div>
+                    <div class="card-content">
+                        <h3>Tour Gastronómico</h3>
+                        <p class="provider">Por Chef Roberto</p>
+                        <div class="card-footer">
+                            <div class="price">$890</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="experience-card" onclick="seleccionarExperiencia('Clase de Baile', 'Grupo Salsa', 350, '20 Dic 2025')">
+                    <div class="card-image" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                        <div class="card-emoji">💃</div>
+                        <span class="card-badge">Cultural</span>
+                    </div>
+                    <div class="card-content">
+                        <h3>Clase de Baile</h3>
+                        <p class="provider">Por Grupo Salsa</p>
+                        <div class="card-footer">
+                            <div class="price">$350</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="detalle-view" class="view">
+        <nav class="navbar">
+            <div class="nav-content">
+                <div class="nav-brand">Detalle</div>
+                <div class="nav-menu">
+                    <a href="#" class="nav-link" onclick="navigateTo('experiencias-view')">← Volver</a>
+                </div>
+            </div>
+        </nav>
+        <div class="detail-container">
+            <div class="detail-header">
+                <div class="detail-image"><div class="detail-emoji">✨</div></div>
+                <div class="detail-info">
+                    <h1 id="detail-title">Título Experiencia</h1>
+                    <p class="provider-name" id="detail-provider">Proveedor</p>
+                </div>
+            </div>
+            <div class="detail-content">
+                <div class="detail-main">
+                    <section class="detail-section">
+                        <h2>Descripción</h2>
+                        <p>Disfruta de una experiencia inolvidable con los mejores anfitriones locales.</p>
+                    </section>
+                </div>
+                <div class="detail-sidebar">
+                    <div class="booking-card">
+                        <div class="booking-price">
+                            <span class="price-amount" id="detail-price">$0</span>
+                        </div>
+                        <button class="btn-book" onclick="prepararPago()">Reservar Ahora</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="pago-view" class="view">
+        <nav class="navbar"><div class="nav-content"><div class="nav-brand">Pago Seguro</div></div></nav>
+        <div class="payment-container">
+            <div class="payment-content">
+                <div class="payment-main">
+                    <h1>Resumen de Pago</h1>
+                    <div class="payment-form">
+                        <div class="form-group">
+                            <label>Número de Tarjeta (Simulado)</label>
+                            <input type="text" placeholder="1234 5678 9012 3456">
+                        </div>
+                        <button type="button" class="btn-pay" onclick="procesarPago()">Pagar Total</button>
+                    </div>
+                </div>
+                <div class="payment-summary">
+                    <div class="summary-card">
+                        <h3 id="pay-title">Experiencia</h3>
+                        <p id="pay-provider">Proveedor</p>
+                        <div class="pricing-row total">
+                            <strong>Total a Pagar</strong>
+                            <strong id="pay-total">$0</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="confirmacion-view" class="view">
+        <div class="confirmation-container">
+            <div class="confirmation-content">
+                <div class="success-icon">✅</div>
+                <h1>¡Reserva Confirmada!</h1>
+                <div class="confirmation-card">
+                    <div class="confirmation-number">
+                        <span class="label">Código de Reserva:</span>
+                        <span class="number" id="conf-id">...</span>
+                    </div>
+                </div>
+                <button class="btn-primary" onclick="navigateTo('experiencias-view')">Volver al Inicio</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="admin-view" class="view">
+        <nav class="navbar navbar-admin">
+            <div class="nav-content">
+                <div class="nav-brand">Panel Admin</div>
+                <button class="btn-logout" onclick="navigateTo('login-view')">Salir</button>
+            </div>
+        </nav>
+        <div class="dashboard-container">
+            <h1>Bienvenido Administrador</h1>
+            <p>Aquí verías la gestión de experiencias.</p>
+        </div>
+    </div>
+
+    <div id="proveedor-view" class="view">
+        <nav class="navbar">
+            <div class="nav-content">
+                <div class="nav-brand">Panel Proveedor</div>
+                <button class="btn-logout" onclick="navigateTo('login-view')">Salir</button>
+            </div>
+        </nav>
+        <div class="dashboard-container">
+            <h1>Bienvenido Proveedor</h1>
+            <p>Aquí gestionarías tus experiencias.</p>
+        </div>
+    </div>
+
+    <script src="js/visitante.js"></script>
+</body>
+</html>
