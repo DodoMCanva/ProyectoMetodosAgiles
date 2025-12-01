@@ -29,9 +29,7 @@ app.get('/api/setup', async (req, res) => {
     try {
         await Usuario.deleteMany({});
         await Usuario.create([
-            { nombre: 'Admin', email: 'admin@test.com', password: '123', rol: 'admin' },
-            { nombre: 'Juan', email: 'juan@test.com', password: '123', rol: 'visitante' },
-            { nombre: 'Maria', email: 'maria@test.com', password: '123', rol: 'proveedor' }
+            { nombre: 'Admin', email: 'admin@test.com', password: '123', rol: 'admin' }
         ]);
         res.send('Usuarios de prueba creados correctamente');
     } catch (error) {

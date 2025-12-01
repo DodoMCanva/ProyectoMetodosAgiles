@@ -20,13 +20,15 @@ async function handleLogin() {
 
         if (data.success) {
             // Guardamos el email para poder reservar después
+            localStorage.clear();
             localStorage.setItem('email', email);
             alert('Bienvenido ' + data.nombre);
             
             // Redirección por rol
             if (data.rol === 'admin') window.location.href = "admin.html";
             else if (data.rol === 'proveedor') window.location.href = "proveedor.html";
-            else window.location.href = "visitante.html";
+            else if (data.rol === 'visitante') window.location.href = "visitante.html";
+            else window.location.href = "login.html";
         } else {
             alert(data.message);
         }
