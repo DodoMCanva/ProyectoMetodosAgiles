@@ -164,6 +164,43 @@ app.get('/api/cargar-experiencias', async (req, res) => {
 });
 
 
+// Editar experiencia por ID
+app.put('/api/experiencias/:id', async (req, res) => {
+    const { id } = req.params;
+    const { nombre, descripcion, fecha, cupo, precio, ubicacion } = req.body;
+    try {
+        const exp = await Experiencia.findById(id);
+        if (!exp) return res.status(404).json({ success: false, message: 'Experiencia no encontrada' });
+
+        if (nombre !== undefined) exp.nombre = nombre;
+        if (descripcion !== undefined) exp.descripcion = descripcion;
+        if (fecha !== undefined) exp.fecha = fecha;
+        if (cupo !== undefined) exp.cupo = cupo;
+        if (precio !== undefined) exp.precio = precio;
+        if (ubicacion !== undefined) exp.ubicacion = ubicacion;
+
+        await exp.save();
+        res.json({ success: true, message: 'Experiencia actualizada', experiencia: exp });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: 'Error al actualizar experiencia' });
+    }
+});
+
+// Eliminar experiencia por ID
+app.delete('/api/experiencias/:id', async (req, res) => {
+    const { id } = req.params;
+    try {
+        const exp = await Experiencia.findByIdAndDelete(id);
+        if (!exp) return res.status(404).json({ success: false, message: 'Experiencia no encontrada' });
+        res.json({ success: true, message: 'Experiencia eliminada' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: 'Error al eliminar experiencia' });
+    }
+});
+
+
 // --- RUTA DE VERIFICACIÓN (Solo para pruebas) ---
 app.get('/api/ver-usuarios', async (req, res) => {
     try {
