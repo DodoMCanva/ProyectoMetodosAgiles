@@ -101,9 +101,20 @@ app.post('/api/register', async (req, res) => {
     }
 });
 
-app.post('/api/registrar-experiencias', async (req, res) => {
+
+// Crear experiencia (RESTful, acepta proveedorEmail o proveedor)
+app.post('/api/experiencias', async (req, res) => {
     try {
-        const { nombre, descripcion, fecha, cupo, precio, ubicacion, proveedorId } = req.body;
+        const { nombre, descripcion, fecha, cupo, precio, ubicacion, imagen, proveedorEmail, proveedor } = req.body;
+        if (!nombre || !descripcion || !fecha || !cupo || precio === undefined || !ubicacion || (!proveedorEmail && !proveedor)) {
+            return res.status(400).json({ success: false, message: 'Faltan campos obligatorios' });
+        }
+
+        let proveedorObj = null;
+        if (proveedorEmail) {
+            proveedorObj = await Usuario.findOne({ email: proveedorEmail });
+            if (!proveedorObj) return res.status(400).json({ success: false, message: 'Proveedor no encontrado' });
+        }
 
         const nuevaExp = new Experiencia({
             nombre,
@@ -112,11 +123,12 @@ app.post('/api/registrar-experiencias', async (req, res) => {
             cupo,
             precio,
             ubicacion,
-            proveedor: proveedorId
+            imagen: imagen || '',
+            proveedor: proveedorObj ? proveedorObj._id : proveedor
         });
 
         await nuevaExp.save();
-        res.json({ success: true, message: 'Experiencia creada', experiencia: nuevaExp });
+        res.status(201).json({ success: true, message: 'Experiencia creada', experiencia: nuevaExp });
     } catch (error) {
         console.error(error);
         res.status(500).json({ success: false, message: 'Error al crear experiencia' });
@@ -153,9 +165,16 @@ app.post('/api/pagar-experiencia', async (req, res) => {
     }
 });
 
-app.get('/api/cargar-experiencias', async (req, res) => {
+// Obtener todas las experiencias (RESTful)
+app.get('/api/experiencias', async (req, res) => {
     try {
-        const experiencias = await Experiencia.find({});
+        // Permitir filtrar por proveedor (opcional)
+        const filtro = {};
+        if (req.query.proveedorEmail) {
+            const prov = await Usuario.findOne({ email: req.query.proveedorEmail });
+            if (prov) filtro.proveedor = prov._id;
+        }
+        const experiencias = await Experiencia.find(filtro).populate('proveedor', 'email nombre');
         res.json(experiencias);
     } catch (error) {
         console.error(error);

@@ -140,7 +140,7 @@ async function renderExperienciasList() {
     // Obtener experiencias del backend (solo las del proveedor actual)
     let experiencias = [];
     try {
-        const res = await fetch('/api/cargar-experiencias');
+        const res = await fetch('/api/experiencias');
         if (res.ok) {
             const all = await res.json();
             experiencias = all.filter(e => e.proveedorEmail === usuarioActualEmail || (e.proveedor && e.proveedor.email === usuarioActualEmail));
@@ -184,7 +184,7 @@ async function openEditExperienceForm(id) {
     // Buscar experiencia por id
     let exp = null;
     try {
-        const res = await fetch('/api/cargar-experiencias');
+        const res = await fetch('/api/experiencias');
         if (res.ok) {
             const all = await res.json();
             exp = all.find(e => (e._id === id || e.id === id) && (e.proveedorEmail === usuarioActualEmail || (e.proveedor && e.proveedor.email === usuarioActualEmail)));
