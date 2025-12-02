@@ -132,19 +132,30 @@ function getLocalExperiences() {
     return JSON.parse(localStorage.getItem(key) || '[]');
 }
 
-function renderExperienciasList() {
+async function renderExperienciasList() {
     const container = document.getElementById('experiencias-list');
     if (!container) return;
     container.innerHTML = '';
 
-    // cargar locales primero
-    const locales = getLocalExperiences();
-    if (locales.length === 0) {
+    // Obtener experiencias del backend (solo las del proveedor actual)
+    let experiencias = [];
+    try {
+        const res = await fetch('/api/cargar-experiencias');
+        if (res.ok) {
+            const all = await res.json();
+            experiencias = all.filter(e => e.proveedorEmail === usuarioActualEmail || (e.proveedor && e.proveedor.email === usuarioActualEmail));
+        }
+    } catch (e) {
+        // Si falla, usar localStorage
+        experiencias = getLocalExperiences();
+    }
+
+    if (!experiencias || experiencias.length === 0) {
         container.innerHTML = '<p>No hay experiencias registradas.</p>';
         return;
     }
 
-    locales.forEach(exp => {
+    experiencias.forEach(exp => {
         const card = document.createElement('div');
         card.className = 'experience-card small-card';
         card.innerHTML = `
@@ -153,15 +164,112 @@ function renderExperienciasList() {
             </div>
             <div class="card-content">
                 <h4>${escapeHtml(exp.nombre)}</h4>
-                <p style="font-size:0.9rem;margin:4px 0;">${escapeHtml(exp.descripcion.substring(0, 100))}${exp.descripcion.length>100? '...':''}</p>
+                <p style="font-size:0.9rem;margin:4px 0;">${escapeHtml((exp.descripcion||'').substring(0, 100))}${exp.descripcion && exp.descripcion.length>100? '...':''}</p>
                 <div class="card-footer">
-                    <small>${escapeHtml(exp.fecha)} • ${escapeHtml(exp.ubicacion)}</small>
+                    <small>${escapeHtml(exp.fecha ? (exp.fecha+"").substring(0,10) : '')} • ${escapeHtml(exp.ubicacion||'')}</small>
                     <div style="float:right;"><strong>$${exp.precio}</strong></div>
+                </div>
+                <div class="card-actions" style="margin-top:8px;">
+                    <button class="btn-secondary" onclick="openEditExperienceForm('${exp._id||exp.id}')">Editar</button>
+                    <button class="btn-danger" onclick="deleteExperience('${exp._id||exp.id}')">Eliminar</button>
                 </div>
             </div>
         `;
         container.appendChild(card);
     });
+}
+
+// --- Edición de experiencia ---
+async function openEditExperienceForm(id) {
+    // Buscar experiencia por id
+    let exp = null;
+    try {
+        const res = await fetch('/api/cargar-experiencias');
+        if (res.ok) {
+            const all = await res.json();
+            exp = all.find(e => (e._id === id || e.id === id) && (e.proveedorEmail === usuarioActualEmail || (e.proveedor && e.proveedor.email === usuarioActualEmail)));
+        }
+    } catch {
+        // fallback local
+        exp = getLocalExperiences().find(e => e.id === id);
+    }
+    if (!exp) return alert('No se encontró la experiencia');
+
+    // Llenar formulario
+    document.getElementById('edit-exp-id').value = exp._id || exp.id;
+    document.getElementById('edit-exp-nombre').value = exp.nombre || '';
+    document.getElementById('edit-exp-descripcion').value = exp.descripcion || '';
+    document.getElementById('edit-exp-fecha').value = exp.fecha ? (exp.fecha+"").substring(0,10) : '';
+    document.getElementById('edit-exp-cupo').value = exp.cupo || '';
+    document.getElementById('edit-exp-precio').value = exp.precio || '';
+    document.getElementById('edit-exp-ubicacion').value = exp.ubicacion || '';
+    document.getElementById('edit-exp-imagen').value = exp.imagen || '';
+
+    document.getElementById('edit-experience-modal').style.display = 'block';
+    document.getElementById('edit-feedback').style.display = 'none';
+}
+
+function closeEditExperienceForm() {
+    document.getElementById('edit-experience-modal').style.display = 'none';
+}
+
+document.getElementById('edit-experience-form').onsubmit = async function(e) {
+    e.preventDefault();
+    const id = document.getElementById('edit-exp-id').value;
+    const nombre = document.getElementById('edit-exp-nombre').value.trim();
+    const descripcion = document.getElementById('edit-exp-descripcion').value.trim();
+    const fecha = document.getElementById('edit-exp-fecha').value;
+    const cupo = parseInt(document.getElementById('edit-exp-cupo').value, 10);
+    const precio = parseFloat(document.getElementById('edit-exp-precio').value);
+    const ubicacion = document.getElementById('edit-exp-ubicacion').value.trim();
+    const imagen = document.getElementById('edit-exp-imagen').value.trim();
+    const feedback = document.getElementById('edit-feedback');
+
+    if (!nombre || !descripcion || !fecha || !cupo || isNaN(precio) || !ubicacion) {
+        feedback.style.display = 'block';
+        feedback.style.color = 'crimson';
+        feedback.textContent = 'Por favor complete todos los campos obligatorios.';
+        return;
+    }
+
+    // PUT al backend
+    try {
+        const res = await fetch(`/api/experiencias/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ nombre, descripcion, fecha, cupo, precio, ubicacion, imagen })
+        });
+        if (res.ok) {
+            feedback.style.display = 'block';
+            feedback.style.color = 'green';
+            feedback.textContent = 'Experiencia actualizada.';
+            setTimeout(() => { closeEditExperienceForm(); renderExperienciasList(); }, 800);
+        } else {
+            feedback.style.display = 'block';
+            feedback.style.color = 'crimson';
+            feedback.textContent = 'Error al actualizar experiencia.';
+        }
+    } catch {
+        feedback.style.display = 'block';
+        feedback.style.color = 'crimson';
+        feedback.textContent = 'Error de red.';
+    }
+};
+
+// --- Eliminar experiencia ---
+async function deleteExperience(id) {
+    if (!confirm('¿Seguro que deseas eliminar esta experiencia?')) return;
+    try {
+        const res = await fetch(`/api/experiencias/${id}`, { method: 'DELETE' });
+        if (res.ok) {
+            alert('Experiencia eliminada');
+            renderExperienciasList();
+        } else {
+            alert('Error al eliminar experiencia');
+        }
+    } catch {
+        alert('Error de red al eliminar experiencia');
+    }
 }
 
 function escapeHtml(str) {

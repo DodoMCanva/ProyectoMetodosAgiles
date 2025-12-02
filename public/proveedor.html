@@ -221,6 +221,53 @@
                     <div id="experiencias-list" class="experiences-list">
                         <!-- Lista renderizada por JS -->
                     </div>
+                    <!-- Formulario de edición (modal simple) -->
+                    <div id="edit-experience-modal" class="modal" style="display:none;">
+                        <div class="modal-content">
+                            <span class="close" onclick="closeEditExperienceForm()">&times;</span>
+                            <h3>Editar experiencia</h3>
+                            <form id="edit-experience-form">
+                                <input type="hidden" id="edit-exp-id">
+                                <div class="form-group">
+                                    <label for="edit-exp-nombre">Nombre</label>
+                                    <input id="edit-exp-nombre" type="text" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="edit-exp-descripcion">Descripción</label>
+                                    <textarea id="edit-exp-descripcion" rows="4" required></textarea>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="edit-exp-fecha">Fecha</label>
+                                        <input id="edit-exp-fecha" type="date" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="edit-exp-cupo">Cupo</label>
+                                        <input id="edit-exp-cupo" type="number" min="1" required>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="edit-exp-precio">Precio (MXN)</label>
+                                        <input id="edit-exp-precio" type="number" step="0.01" min="0" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="edit-exp-ubicacion">Ubicación</label>
+                                        <input id="edit-exp-ubicacion" type="text" required>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="edit-exp-imagen">Imagen (URL, opcional)</label>
+                                    <input id="edit-exp-imagen" type="text" placeholder="https://...">
+                                </div>
+                                <div class="form-actions">
+                                    <button type="button" class="btn-secondary" onclick="closeEditExperienceForm()">Cancelar</button>
+                                    <button type="submit" class="btn-primary">Guardar cambios</button>
+                                </div>
+                                <div id="edit-feedback" style="margin-top:8px;color:green;display:none;"></div>
+                            </form>
+                        </div>
+                    </div>
                 </div>
             </section>
         </div>
