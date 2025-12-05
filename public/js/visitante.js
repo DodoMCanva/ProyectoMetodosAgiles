@@ -26,6 +26,8 @@ function navigateTo(viewId) {
     if (target) {
         target.classList.add('active');
         window.scrollTo(0, 0);
+        // Si vamos a la vista de reservaciones, renderizarlas
+        if (viewId === 'mis-reservas-view') renderMisReservasList();
     }
 }
 
@@ -118,12 +120,20 @@ function prepararPago() {
 // Paso 3: Procesar pago y guardar en Base de Datos
 async function procesarPago() {
     validarSesion();
+    if (!experienciaSeleccionada || !experienciaSeleccionada.id) {
+        alert('No hay una experiencia seleccionada.');
+        navigateTo('experiencias-view');
+        return;
+    }
+
     const datosPago = {
         usuarioEmail: usuarioActualEmail,
         propietario: document.getElementById('propietario-text').value,
         tarjeta: document.getElementById('tarjeta-text').value,
         cvv: document.getElementById('cvv-pass').value,
-        vencimiento: document.getElementById('vencimiento-text').value
+        vencimiento: document.getElementById('vencimiento-text').value,
+        experienciaId: experienciaSeleccionada.id,
+        total: experienciaSeleccionada.total || experienciaSeleccionada.precio || 0
     };
 
     try {
@@ -135,15 +145,51 @@ async function procesarPago() {
         const data = await res.json();
 
         if (data.success) {
-            // Generar y Mostrar ID de reserva
-            //document.getElementById('conf-id').innerText = data.reservaId;
-            //navigateTo('confirmacion-view');
+            // Mostrar ID de reserva y navegar a confirmación
+            if (data.reservaId) document.getElementById('conf-id').innerText = data.reservaId;
+            navigateTo('confirmacion-view');
         } else {
             alert('Error al reservar: ' + data.message);
         }
     } catch (e) {
         console.error(e);
         alert('Error procesando pago');
+    }
+}
+
+// Mostrar las reservaciones del usuario
+async function renderMisReservasList() {
+    const container = document.getElementById('reservas-list');
+    if (!container) return;
+    container.innerHTML = '<p>Cargando reservaciones...</p>';
+
+    try {
+        const res = await fetch(`/api/reservaciones?usuarioEmail=${encodeURIComponent(usuarioActualEmail)}`);
+        if (!res.ok) throw new Error('Error obteniendo reservaciones');
+        const reservas = await res.json();
+        if (!Array.isArray(reservas) || reservas.length === 0) {
+            container.innerHTML = '<p>No tienes reservaciones.</p>';
+            return;
+        }
+
+        container.innerHTML = '';
+        reservas.forEach(r => {
+            const card = document.createElement('div');
+            card.className = 'reservation-card';
+            const exp = r.experiencia || {};
+            const fechaExp = exp.fecha ? new Date(exp.fecha).toLocaleDateString('es-ES') : '';
+            card.innerHTML = `
+                <h4>${escapeHtml(exp.nombre || '—')}</h4>
+                <p>${escapeHtml(exp.ubicacion || '')} • ${fechaExp}</p>
+                <p><strong>Total:</strong> $${r.total}</p>
+                <p><strong>Estado:</strong> ${escapeHtml(r.status)}</p>
+                <p><small>ID Reserva: ${r._id}</small></p>
+            `;
+            container.appendChild(card);
+        });
+    } catch (e) {
+        console.error(e);
+        container.innerHTML = '<p>Error cargando reservaciones.</p>';
     }
 }
 

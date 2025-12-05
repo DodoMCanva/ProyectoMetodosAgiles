@@ -31,15 +31,29 @@ const ExperienciaSchema = new mongoose.Schema({
     precio: { type: Number, required: true },
     ubicacion: { type: String, required: true },
 
+    proveedorEmail: { type: String },
+
     proveedor: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Usuario',
-        required: true
-    }
+        ref: 'Usuario'
+    },
+
+    imagen: { type: String }
 });
 
 const Experiencia = mongoose.model('Experiencia', ExperienciaSchema);
 const Usuario = mongoose.model('Usuario', UsuarioSchema);
+
+// Definición del modelo Reserva
+const ReservaSchema = new mongoose.Schema({
+    experiencia: { type: mongoose.Schema.Types.ObjectId, ref: 'Experiencia', required: true },
+    usuarioEmail: { type: String, required: true },
+    propietario: { type: String, required: true },
+    total: { type: Number, required: true },
+    creadoEn: { type: Date, default: Date.now },
+    status: { type: String, default: 'confirmada' }
+});
+const Reserva = mongoose.model('Reserva', ReservaSchema);
 
 // Ruta para crear datos de prueba iniciales
 app.get('/api/setup', async (req, res) => {
@@ -137,9 +151,9 @@ app.post('/api/experiencias', async (req, res) => {
 
 app.post('/api/pagar-experiencia', async (req, res) => {
     try {
-        const { usuarioEmail, propietario, tarjeta, cvv, vencimiento } = req.body;
+        const { usuarioEmail, propietario, tarjeta, cvv, vencimiento, experienciaId, total } = req.body;
 
-        if (!usuarioEmail || !propietario || !tarjeta || !cvv || !vencimiento) {
+        if (!usuarioEmail || !propietario || !tarjeta || !cvv || !vencimiento || !experienciaId || total === undefined) {
             return res.status(400).json({
                 success: false,
                 message: 'Faltan datos obligatorios para procesar el pago'
@@ -158,7 +172,21 @@ app.post('/api/pagar-experiencia', async (req, res) => {
             return res.status(400).json({ success: false, message: 'CVV inválido' });
         }
 
-        res.json({ success: true, message: 'Experiencia pagada' });
+        // Verificar que la experiencia exista
+        const experiencia = await Experiencia.findById(experienciaId);
+        if (!experiencia) return res.status(404).json({ success: false, message: 'Experiencia no encontrada' });
+
+        // Aquí se simula el pago con la pasarela externa. Si todo OK, crear reserva
+        const nuevaReserva = new Reserva({
+            experiencia: experiencia._id,
+            usuarioEmail,
+            propietario,
+            total: Number(total),
+            status: 'confirmada'
+        });
+        await nuevaReserva.save();
+
+        res.json({ success: true, message: 'Experiencia pagada', reservaId: nuevaReserva._id });
     } catch (error) {
         console.error(error);
         res.status(500).json({ success: false, message: 'No se pudo pagar la experiencia' });
@@ -179,6 +207,19 @@ app.get('/api/experiencias', async (req, res) => {
     } catch (error) {
         console.error(error);
         res.status(500).json({ success: false, message: 'Error al obtener experiencias' });
+    }
+});
+
+// Obtener reservaciones por usuario
+app.get('/api/reservaciones', async (req, res) => {
+    try {
+        const filtro = {};
+        if (req.query.usuarioEmail) filtro.usuarioEmail = req.query.usuarioEmail;
+        const reservas = await Reserva.find(filtro).populate({ path: 'experiencia', select: 'nombre fecha ubicacion precio imagen' });
+        res.json(reservas);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: 'Error al obtener reservaciones' });
     }
 });
 
