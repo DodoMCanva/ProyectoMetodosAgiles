@@ -12,6 +12,7 @@
             <div class="nav-content">
                 <div class="nav-brand">Experiencias Locales</div>
                 <div class="nav-menu">
+                    <button class="btn-secondary" onclick="navigateTo('mis-reservas-view')">Mis Reservas</button>
                     <button class="btn-logout" onclick="navigateTo('login-view')">Salir</button>
                 </div>
             </div>
@@ -147,6 +148,23 @@
                     </div>
                 </div>
                 <button class="btn-primary" onclick="navigateTo('experiencias-view')">Volver al Inicio</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="mis-reservas-view" class="view">
+        <nav class="navbar">
+            <div class="nav-content">
+                <div class="nav-brand">Mis Reservas</div>
+                <div class="nav-menu">
+                    <a href="#" class="nav-link" onclick="navigateTo('experiencias-view')">← Volver</a>
+                </div>
+            </div>
+        </nav>
+        <div class="content-wrapper">
+            <h2>Mis reservaciones</h2>
+            <div id="reservas-list" class="reservas-list">
+                <!-- Reservas renderizadas por JS -->
             </div>
         </div>
     </div>
