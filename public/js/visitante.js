@@ -193,6 +193,57 @@ async function procesarPago() {
     }
 }
 
+// Renderizar las reservaciones del usuario
+async function renderMisReservasList() {
+    validarSesion();
+    const lista = document.getElementById('reservas-list');
+    if (!lista) return;
+    lista.innerHTML = '';
+
+    const usuario = usuarioActualEmail;
+    if (!usuario) {
+        lista.innerHTML = '<p>No se encontró usuario. Inicia sesión.</p>';
+        return;
+    }
+
+    try {
+        const params = new URLSearchParams({ usuarioEmail: usuario });
+        const res = await fetch(`/api/reservaciones?${params.toString()}`);
+        if (!res.ok) throw new Error('Error al obtener reservaciones');
+        const reservas = await res.json();
+
+        if (!Array.isArray(reservas) || reservas.length === 0) {
+            lista.innerHTML = '<p>No tienes reservaciones aún.</p>';
+            return;
+        }
+
+        reservas.forEach(r => {
+            const exp = r.experiencia || {};
+            const cont = document.createElement('div');
+            cont.className = 'reserva-card';
+
+            const fechaTexto = exp.fecha ? new Date(exp.fecha).toLocaleString('es-ES') : '';
+            cont.innerHTML = `
+                <div class="reserva-header">
+                    <strong>${escapeHtml(exp.nombre || 'Sin nombre')}</strong>
+                    <span class="reserva-id">#${escapeHtml(String(r._id || r.id || ''))}</span>
+                </div>
+                <div class="reserva-body">
+                    <div>Fecha: ${escapeHtml(fechaTexto)}</div>
+                    <div>Ubicación: ${escapeHtml(exp.ubicacion || '')}</div>
+                    <div>Monto: $${escapeHtml(String(r.total || exp.precio || 0))}</div>
+                    <div>Estado: ${escapeHtml(r.status || 'desconocido')}</div>
+                </div>
+            `;
+
+            lista.appendChild(cont);
+        });
+    } catch (e) {
+        console.error(e);
+        lista.innerHTML = '<p>Error cargando tus reservaciones.</p>';
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     renderExperienciasList();
     navigateTo('experiencias-view');
