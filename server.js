@@ -151,9 +151,9 @@ app.post('/api/experiencias', async (req, res) => {
 
 app.post('/api/pagar-experiencia', async (req, res) => {
     try {
-        const { usuarioEmail, propietario, tarjeta, cvv, vencimiento, experienciaId } = req.body;
+        const { usuarioEmail, propietario, tarjeta, cvv, vencimiento, experienciaId, total } = req.body;
 
-        if (!usuarioEmail || !propietario || !tarjeta || !cvv || !vencimiento || !experienciaId) {
+        if (!usuarioEmail || !propietario || !tarjeta || !cvv || !vencimiento || !experienciaId || total === undefined) {
             return res.status(400).json({
                 success: false,
                 message: 'Faltan datos obligatorios para procesar el pago'
@@ -172,33 +172,28 @@ app.post('/api/pagar-experiencia', async (req, res) => {
             return res.status(400).json({ success: false, message: 'CVV inválido' });
         }
 
+        // Decrementar cupo de forma atómica y obtener la experiencia actualizada
         const expActualizada = await Experiencia.findOneAndUpdate(
-            {
-                _id: experienciaId,
-                cupo: { $gt: 0 }
-            },
-            {
-                $inc: { cupo: -1 }
-            },
-            {
-                new: true       
-            }
+            { _id: experienciaId, cupo: { $gt: 0 } },
+            { $inc: { cupo: -1 } },
+            { new: true }
         );
 
         if (!expActualizada) {
-            return res.status(400).json({
-                success: false,
-                message: 'No hay cupos disponibles para esta experiencia'
-            });
+            return res.status(400).json({ success: false, message: 'No hay cupos disponibles para esta experiencia' });
         }
 
-        // Aquí iría la lógica real de cobro si existiera
-
-        res.json({
-            success: true,
-            message: 'Experiencia pagada',
-            cupoRestante: expActualizada.cupo
+        // Simular cobro y crear reserva
+        const nuevaReserva = new Reserva({
+            experiencia: expActualizada._id,
+            usuarioEmail,
+            propietario,
+            total: Number(total),
+            status: 'confirmada'
         });
+        await nuevaReserva.save();
+
+        res.json({ success: true, message: 'Experiencia pagada', cupoRestante: expActualizada.cupo, reservaId: nuevaReserva._id });
     } catch (error) {
         console.error(error);
         res.status(500).json({ success: false, message: 'No se pudo pagar la experiencia' });
