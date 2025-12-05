@@ -165,22 +165,31 @@ app.post('/api/pagar-experiencia', async (req, res) => {
     }
 });
 
-// Obtener todas las experiencias (RESTful)
 app.get('/api/experiencias', async (req, res) => {
     try {
-        // Permitir filtrar por proveedor (opcional)
         const filtro = {};
         if (req.query.proveedorEmail) {
             const prov = await Usuario.findOne({ email: req.query.proveedorEmail });
             if (prov) filtro.proveedor = prov._id;
         }
-        const experiencias = await Experiencia.find(filtro).populate('proveedor', 'email nombre');
+
+        if (req.query.ubicacion) {
+            filtro.ubicacion = req.query.ubicacion;
+        }
+
+
+        const experiencias = await Experiencia
+            .find(filtro)
+            .populate('proveedor', 'email nombre');
+
         res.json(experiencias);
     } catch (error) {
         console.error(error);
         res.status(500).json({ success: false, message: 'Error al obtener experiencias' });
     }
 });
+
+
 
 
 // Editar experiencia por ID

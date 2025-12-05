@@ -10,7 +10,7 @@ function validarSesion() {
     }
 }
 
-validarSesion()
+validarSesion();
 
 // --- NAVEGACIÓN ---
 function navigateTo(viewId) {
@@ -19,9 +19,7 @@ function navigateTo(viewId) {
         window.location.href = "index.html";
         return;
     }
-    // Ocultar todas las vistas
     document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-    // Mostrar la vista deseada
     const target = document.getElementById(viewId);
     if (target) {
         target.classList.add('active');
@@ -31,16 +29,100 @@ function navigateTo(viewId) {
 
 // --- LÓGICA DE RESERVA ---
 
-// Paso 1: Seleccionar tarjeta (Esto se llama desde el HTML onclick)
+// Paso 1: Seleccionar tarjeta
 function seleccionarExperiencia(titulo, proveedor, precio, fecha) {
     experienciaSeleccionada = { titulo, proveedor, precio, fecha };
 
-    // Llenar vista detalle con los datos recibidos
     document.getElementById('detail-title').innerText = titulo;
     document.getElementById('detail-provider').innerText = 'Por ' + proveedor;
     document.getElementById('detail-price').innerText = '$' + precio;
 
     navigateTo('detalle-view');
+}
+
+// Renderiza las experiencias desde el servidor, con filtros
+async function renderExperienciasList() {
+    const grid = document.querySelector('.experiences-grid');
+    if (!grid) return;
+    grid.innerHTML = '';
+
+    const switchLocal = document.getElementById('switch-local');
+    const filtroUbicacion = document.getElementById('filtro-ubicacion');
+
+    const useLocalFilter = switchLocal?.checked;
+    const ubicacion = filtroUbicacion?.value || '';
+
+    let url = '/api/experiencias';
+    if (useLocalFilter && ubicacion) {
+        const params = new URLSearchParams({ ubicacion });
+        url = `/api/experiencias?${params.toString()}`;
+    }
+    console.log('useLocalFilter:', useLocalFilter, 'ubicacion:', ubicacion, 'url:', url);
+
+    try {
+        const res = await fetch(url);
+        if (!res.ok) throw new Error('No se pudo obtener experiencias');
+        const experiencias = await res.json();
+
+        if (!Array.isArray(experiencias) || experiencias.length === 0) {
+            grid.innerHTML = '<p>No hay experiencias disponibles.</p>';
+            return;
+        }
+
+        experiencias.forEach(exp => {
+            const card = document.createElement('div');
+            card.className = 'experience-card';
+
+            const precio = exp.precio || 0;
+            const proveedorNombre =
+                (exp.proveedor && exp.proveedor.nombre) ||
+                exp.proveedorEmail ||
+                'Proveedor local';
+            const fechaTexto = exp.fecha
+                ? new Date(exp.fecha).toLocaleDateString('es-ES')
+                : '';
+
+            card.innerHTML = `
+                <div class="card-image">
+                    <div class="card-emoji">
+                        ${exp.imagen
+                            ? '<img src="' + escapeHtml(exp.imagen) + '" alt="img" style="max-width:64px;max-height:64px;object-fit:cover;">'
+                            : '📍'}
+                    </div>
+                    <span class="card-badge">${escapeHtml(exp.ubicacion || '')}</span>
+                </div>
+                <div class="card-content">
+                    <h3>${escapeHtml(exp.nombre)}</h3>
+                    <p class="provider">Por ${escapeHtml(proveedorNombre)}</p>
+                    <div class="card-footer">
+                        <div class="price">$${precio}</div>
+                    </div>
+                </div>
+            `;
+
+            card.addEventListener('click', () =>
+                seleccionarExperiencia(
+                    exp.nombre,
+                    proveedorNombre,
+                    precio,
+                    fechaTexto,
+                    exp._id || exp.id
+                )
+            );
+
+            grid.appendChild(card);
+        });
+    } catch (e) {
+        console.error(e);
+        grid.innerHTML = '<p>Error cargando experiencias.</p>';
+    }
+}
+
+function escapeHtml(str) {
+    if (!str) return '';
+    return String(str).replace(/[&<>"]/g, function (m) {
+        return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[m];
+    });
 }
 
 // Paso 2: Ir a pagar
@@ -55,7 +137,6 @@ function prepararPago() {
     experienciaSeleccionada.total = total;
     experienciaSeleccionada.personas = 1;
 
-    // Llenar vista pago
     document.getElementById('pay-title').innerText = experienciaSeleccionada.titulo;
     document.getElementById('pay-provider').innerText = 'Por ' + experienciaSeleccionada.proveedor;
     document.getElementById('pay-total').innerText = '$' + total;
@@ -64,7 +145,7 @@ function prepararPago() {
     navigateTo('pago-view');
 }
 
-// Paso 3: Procesar pago y guardar en Base de Datos
+// Paso 3: Procesar pago
 async function procesarPago() {
     validarSesion();
     const datosPago = {
@@ -84,7 +165,6 @@ async function procesarPago() {
         const data = await res.json();
 
         if (data.success) {
-            // Generar y Mostrar ID de reserva
             //document.getElementById('conf-id').innerText = data.reservaId;
             //navigateTo('confirmacion-view');
         } else {
@@ -96,9 +176,24 @@ async function procesarPago() {
     }
 }
 
-
-// Inicializar
 document.addEventListener('DOMContentLoaded', () => {
-    // Al cargar la página, mandamos al login
+    renderExperienciasList();
     navigateTo('experiencias-view');
+
+    const switchLocal = document.getElementById('switch-local');
+    const filtroUbicacion = document.getElementById('filtro-ubicacion');
+
+    if (switchLocal) {
+        switchLocal.addEventListener('change', () => {
+            console.log('switch-local checked:', switchLocal.checked);
+            renderExperienciasList();
+        });
+    }
+
+    if (filtroUbicacion) {
+        filtroUbicacion.addEventListener('change', () => {
+            console.log('ubicacion seleccionada:', filtroUbicacion.value);
+            renderExperienciasList();
+        });
+    }
 });
