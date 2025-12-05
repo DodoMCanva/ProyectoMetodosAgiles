@@ -24,6 +24,8 @@ function navigateTo(viewId) {
     if (target) {
         target.classList.add('active');
         window.scrollTo(0, 0);
+        // Si vamos a la vista de reservaciones, renderizarlas
+        if (viewId === 'mis-reservas-view') renderMisReservasList();
     }
 }
 
@@ -154,13 +156,21 @@ function prepararPago() {
 // Paso 3: Procesar pago
 async function procesarPago() {
     validarSesion();
+    if (!experienciaSeleccionada || !experienciaSeleccionada.id) {
+        alert('No hay una experiencia seleccionada.');
+        navigateTo('experiencias-view');
+        return;
+    }
+
     const datosPago = {
         usuarioEmail: usuarioActualEmail,
         experienciaId: experienciaSeleccionada.id,
         propietario: document.getElementById('propietario-text').value,
         tarjeta: document.getElementById('tarjeta-text').value,
         cvv: document.getElementById('cvv-pass').value,
-        vencimiento: document.getElementById('vencimiento-text').value
+        vencimiento: document.getElementById('vencimiento-text').value,
+        experienciaId: experienciaSeleccionada.id,
+        total: experienciaSeleccionada.total || experienciaSeleccionada.precio || 0
     };
 
     try {
