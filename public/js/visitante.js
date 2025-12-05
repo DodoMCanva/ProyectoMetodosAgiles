@@ -32,8 +32,8 @@ function navigateTo(viewId) {
 // --- LÓGICA DE RESERVA ---
 
 // Paso 1: Seleccionar tarjeta (Esto se llama desde el HTML onclick)
-function seleccionarExperiencia(titulo, proveedor, precio, fecha) {
-    experienciaSeleccionada = { titulo, proveedor, precio, fecha };
+function seleccionarExperiencia(titulo, proveedor, precio, fecha, id) {
+    experienciaSeleccionada = { titulo, proveedor, precio, fecha, id };
 
     // Llenar vista detalle con los datos recibidos
     document.getElementById('detail-title').innerText = titulo;
@@ -41,6 +41,57 @@ function seleccionarExperiencia(titulo, proveedor, precio, fecha) {
     document.getElementById('detail-price').innerText = '$' + precio;
 
     navigateTo('detalle-view');
+}
+
+// Renderiza las experiencias desde el servidor
+async function renderExperienciasList() {
+    const grid = document.querySelector('.experiences-grid');
+    if (!grid) return;
+    grid.innerHTML = '';
+
+    try {
+        const res = await fetch('/api/experiencias');
+        if (!res.ok) throw new Error('No se pudo obtener experiencias');
+        const experiencias = await res.json();
+
+        if (!Array.isArray(experiencias) || experiencias.length === 0) {
+            grid.innerHTML = '<p>No hay experiencias disponibles.</p>';
+            return;
+        }
+
+        experiencias.forEach(exp => {
+            const card = document.createElement('div');
+            card.className = 'experience-card';
+            const precio = exp.precio || 0;
+            const proveedorNombre = (exp.proveedor && exp.proveedor.nombre) || exp.proveedorEmail || 'Proveedor local';
+            const fechaTexto = exp.fecha ? new Date(exp.fecha).toLocaleDateString('es-ES') : '';
+            card.innerHTML = `
+                <div class="card-image">
+                    <div class="card-emoji">${exp.imagen ? '<img src="'+escapeHtml(exp.imagen)+'" alt="img" style="max-width:64px;max-height:64px;object-fit:cover;">' : '📍'}</div>
+                    <span class="card-badge">${escapeHtml(exp.ubicacion || '')}</span>
+                </div>
+                <div class="card-content">
+                    <h3>${escapeHtml(exp.nombre)}</h3>
+                    <p class="provider">Por ${escapeHtml(proveedorNombre)}</p>
+                    <div class="card-footer">
+                        <div class="price">$${precio}</div>
+                    </div>
+                </div>
+            `;
+            card.addEventListener('click', () => seleccionarExperiencia(exp.nombre, proveedorNombre, precio, fechaTexto, exp._id || exp.id));
+            grid.appendChild(card);
+        });
+    } catch (e) {
+        console.error(e);
+        grid.innerHTML = '<p>Error cargando experiencias.</p>';
+    }
+}
+
+function escapeHtml(str) {
+    if (!str) return '';
+    return String(str).replace(/[&<>"]/g, function (m) {
+        return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[m];
+    });
 }
 
 // Paso 2: Ir a pagar
@@ -100,5 +151,6 @@ async function procesarPago() {
 // Inicializar
 document.addEventListener('DOMContentLoaded', () => {
     // Al cargar la página, mandamos al login
+    renderExperienciasList();
     navigateTo('experiencias-view');
 });
