@@ -30,12 +30,14 @@ function navigateTo(viewId) {
 // --- LÓGICA DE RESERVA ---
 
 // Paso 1: Seleccionar tarjeta
-function seleccionarExperiencia(titulo, proveedor, precio, fecha) {
-    experienciaSeleccionada = { titulo, proveedor, precio, fecha };
+function seleccionarExperiencia(titulo, proveedor, precio, fecha, descripcion, cupo, id) {
+    experienciaSeleccionada = { titulo, proveedor, precio, fecha, descripcion, cupo, id };
 
     document.getElementById('detail-title').innerText = titulo;
     document.getElementById('detail-provider').innerText = 'Por ' + proveedor;
     document.getElementById('detail-price').innerText = '$' + precio;
+    document.getElementById('detail-description').innerText = descripcion;
+    document.getElementById('detail-space').innerText = cupo;
 
     navigateTo('detalle-view');
 }
@@ -86,8 +88,8 @@ async function renderExperienciasList() {
                 <div class="card-image">
                     <div class="card-emoji">
                         ${exp.imagen
-                            ? '<img src="' + escapeHtml(exp.imagen) + '" alt="img" style="max-width:64px;max-height:64px;object-fit:cover;">'
-                            : '📍'}
+                    ? '<img src="' + escapeHtml(exp.imagen) + '" alt="img" style="max-width:64px;max-height:64px;object-fit:cover;">'
+                    : '📍'}
                     </div>
                     <span class="card-badge">${escapeHtml(exp.ubicacion || '')}</span>
                 </div>
@@ -106,9 +108,13 @@ async function renderExperienciasList() {
                     proveedorNombre,
                     precio,
                     fechaTexto,
+                    exp.descripcion || '',
+                    exp.cupo,
                     exp._id || exp.id
                 )
             );
+
+
 
             grid.appendChild(card);
         });
@@ -150,6 +156,7 @@ async function procesarPago() {
     validarSesion();
     const datosPago = {
         usuarioEmail: usuarioActualEmail,
+        experienciaId: experienciaSeleccionada.id,
         propietario: document.getElementById('propietario-text').value,
         tarjeta: document.getElementById('tarjeta-text').value,
         cvv: document.getElementById('cvv-pass').value,
@@ -165,8 +172,8 @@ async function procesarPago() {
         const data = await res.json();
 
         if (data.success) {
-            //document.getElementById('conf-id').innerText = data.reservaId;
-            //navigateTo('confirmacion-view');
+            document.getElementById('conf-id').innerText = data.reservaId;
+            navigateTo('confirmacion-view');
         } else {
             alert('Error al reservar: ' + data.message);
         }

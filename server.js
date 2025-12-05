@@ -137,9 +137,9 @@ app.post('/api/experiencias', async (req, res) => {
 
 app.post('/api/pagar-experiencia', async (req, res) => {
     try {
-        const { usuarioEmail, propietario, tarjeta, cvv, vencimiento } = req.body;
+        const { usuarioEmail, propietario, tarjeta, cvv, vencimiento, experienciaId } = req.body;
 
-        if (!usuarioEmail || !propietario || !tarjeta || !cvv || !vencimiento) {
+        if (!usuarioEmail || !propietario || !tarjeta || !cvv || !vencimiento || !experienciaId) {
             return res.status(400).json({
                 success: false,
                 message: 'Faltan datos obligatorios para procesar el pago'
@@ -158,12 +158,39 @@ app.post('/api/pagar-experiencia', async (req, res) => {
             return res.status(400).json({ success: false, message: 'CVV inválido' });
         }
 
-        res.json({ success: true, message: 'Experiencia pagada' });
+        const expActualizada = await Experiencia.findOneAndUpdate(
+            {
+                _id: experienciaId,
+                cupo: { $gt: 0 }
+            },
+            {
+                $inc: { cupo: -1 }
+            },
+            {
+                new: true       
+            }
+        );
+
+        if (!expActualizada) {
+            return res.status(400).json({
+                success: false,
+                message: 'No hay cupos disponibles para esta experiencia'
+            });
+        }
+
+        // Aquí iría la lógica real de cobro si existiera
+
+        res.json({
+            success: true,
+            message: 'Experiencia pagada',
+            cupoRestante: expActualizada.cupo
+        });
     } catch (error) {
         console.error(error);
         res.status(500).json({ success: false, message: 'No se pudo pagar la experiencia' });
     }
 });
+
 
 app.get('/api/experiencias', async (req, res) => {
     try {
