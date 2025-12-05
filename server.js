@@ -151,9 +151,9 @@ app.post('/api/experiencias', async (req, res) => {
 
 app.post('/api/pagar-experiencia', async (req, res) => {
     try {
-        const { usuarioEmail, propietario, tarjeta, cvv, vencimiento, experienciaId, total } = req.body;
+        const { usuarioEmail, propietario, tarjeta, cvv, vencimiento, experienciaId } = req.body;
 
-        if (!usuarioEmail || !propietario || !tarjeta || !cvv || !vencimiento || !experienciaId || total === undefined) {
+        if (!usuarioEmail || !propietario || !tarjeta || !cvv || !vencimiento || !experienciaId) {
             return res.status(400).json({
                 success: false,
                 message: 'Faltan datos obligatorios para procesar el pago'
@@ -172,37 +172,57 @@ app.post('/api/pagar-experiencia', async (req, res) => {
             return res.status(400).json({ success: false, message: 'CVV inválido' });
         }
 
-        // Verificar que la experiencia exista
-        const experiencia = await Experiencia.findById(experienciaId);
-        if (!experiencia) return res.status(404).json({ success: false, message: 'Experiencia no encontrada' });
+        const expActualizada = await Experiencia.findOneAndUpdate(
+            {
+                _id: experienciaId,
+                cupo: { $gt: 0 }
+            },
+            {
+                $inc: { cupo: -1 }
+            },
+            {
+                new: true       
+            }
+        );
 
-        // Aquí se simula el pago con la pasarela externa. Si todo OK, crear reserva
-        const nuevaReserva = new Reserva({
-            experiencia: experiencia._id,
-            usuarioEmail,
-            propietario,
-            total: Number(total),
-            status: 'confirmada'
+        if (!expActualizada) {
+            return res.status(400).json({
+                success: false,
+                message: 'No hay cupos disponibles para esta experiencia'
+            });
+        }
+
+        // Aquí iría la lógica real de cobro si existiera
+
+        res.json({
+            success: true,
+            message: 'Experiencia pagada',
+            cupoRestante: expActualizada.cupo
         });
-        await nuevaReserva.save();
-
-        res.json({ success: true, message: 'Experiencia pagada', reservaId: nuevaReserva._id });
     } catch (error) {
         console.error(error);
         res.status(500).json({ success: false, message: 'No se pudo pagar la experiencia' });
     }
 });
 
-// Obtener todas las experiencias (RESTful)
+
 app.get('/api/experiencias', async (req, res) => {
     try {
-        // Permitir filtrar por proveedor (opcional)
         const filtro = {};
         if (req.query.proveedorEmail) {
             const prov = await Usuario.findOne({ email: req.query.proveedorEmail });
             if (prov) filtro.proveedor = prov._id;
         }
-        const experiencias = await Experiencia.find(filtro).populate('proveedor', 'email nombre');
+
+        if (req.query.ubicacion) {
+            filtro.ubicacion = req.query.ubicacion;
+        }
+
+
+        const experiencias = await Experiencia
+            .find(filtro)
+            .populate('proveedor', 'email nombre');
+
         res.json(experiencias);
     } catch (error) {
         console.error(error);
@@ -222,6 +242,8 @@ app.get('/api/reservaciones', async (req, res) => {
         res.status(500).json({ success: false, message: 'Error al obtener reservaciones' });
     }
 });
+
+
 
 
 // Editar experiencia por ID

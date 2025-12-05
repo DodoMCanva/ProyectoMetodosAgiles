@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Experiencias Locales</title>
     <link rel="stylesheet" href="css/styles.css">
 </head>
+
 <body>
     <div id="experiencias-view" class="view active">
         <nav class="navbar">
@@ -21,47 +23,18 @@
             <div class="hero-section">
                 <h1>Explora Experiencias</h1>
                 <p>Selecciona una actividad para ver detalles</p>
+                <div class="filters-row">
+                    <h5>Buscar Experiencias Locales</h5>
+                    <input type="checkbox" id="switch-local">
+
+                    <select id="filtro-ubicacion">
+                        <option value="">Todas</option>
+                        <option value="CDMX">CDMX</option>
+                        <option value="Guadalajara">Guadalajara</option>
+                    </select>
+                </div>
             </div>
             <div class="experiences-grid">
-                <div class="experience-card" onclick="seleccionarExperiencia('Taller de Cerámica', 'María González', 450, '15 Dic 2025')">
-                    <div class="card-image">
-                        <div class="card-emoji">🏺</div>
-                        <span class="card-badge">Artesanías</span>
-                    </div>
-                    <div class="card-content">
-                        <h3>Taller de Cerámica</h3>
-                        <p class="provider">Por María González</p>
-                        <div class="card-footer">
-                            <div class="price">$450</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="experience-card" onclick="seleccionarExperiencia('Tour Gastronómico', 'Chef Roberto', 890, '18 Dic 2025')">
-                    <div class="card-image" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
-                        <div class="card-emoji">🌮</div>
-                        <span class="card-badge">Comida</span>
-                    </div>
-                    <div class="card-content">
-                        <h3>Tour Gastronómico</h3>
-                        <p class="provider">Por Chef Roberto</p>
-                        <div class="card-footer">
-                            <div class="price">$890</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="experience-card" onclick="seleccionarExperiencia('Clase de Baile', 'Grupo Salsa', 350, '20 Dic 2025')">
-                    <div class="card-image" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
-                        <div class="card-emoji">💃</div>
-                        <span class="card-badge">Cultural</span>
-                    </div>
-                    <div class="card-content">
-                        <h3>Clase de Baile</h3>
-                        <p class="provider">Por Grupo Salsa</p>
-                        <div class="card-footer">
-                            <div class="price">$350</div>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
@@ -77,7 +50,9 @@
         </nav>
         <div class="detail-container">
             <div class="detail-header">
-                <div class="detail-image"><div class="detail-emoji">✨</div></div>
+                <div class="detail-image">
+                    <div class="detail-emoji">✨</div>
+                </div>
                 <div class="detail-info">
                     <h1 id="detail-title">Título Experiencia</h1>
                     <p class="provider-name" id="detail-provider">Proveedor</p>
@@ -86,8 +61,10 @@
             <div class="detail-content">
                 <div class="detail-main">
                     <section class="detail-section">
+                        <h2>Cupo</h2>
+                        <p id="detail-space">n</p>
                         <h2>Descripción</h2>
-                        <p>Disfruta de una experiencia inolvidable con los mejores anfitriones locales.</p>
+                        <p id="detail-description">Disfruta de una experiencia inolvidable con los mejores anfitriones locales.</p>
                     </section>
                 </div>
                 <div class="detail-sidebar">
@@ -103,7 +80,11 @@
     </div>
 
     <div id="pago-view" class="view">
-        <nav class="navbar"><div class="nav-content"><div class="nav-brand">Pago Seguro</div></div></nav>
+        <nav class="navbar">
+            <div class="nav-content">
+                <div class="nav-brand">Pago Seguro</div>
+            </div>
+        </nav>
         <div class="payment-container">
             <div class="payment-content">
                 <div class="payment-main">
@@ -170,4 +151,5 @@
     </div>
     <script src="js/visitante.js"></script>
 </body>
+
 </html>

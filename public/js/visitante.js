@@ -10,7 +10,7 @@ function validarSesion() {
     }
 }
 
-validarSesion()
+validarSesion();
 
 // --- NAVEGACIÓN ---
 function navigateTo(viewId) {
@@ -19,9 +19,7 @@ function navigateTo(viewId) {
         window.location.href = "index.html";
         return;
     }
-    // Ocultar todas las vistas
     document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-    // Mostrar la vista deseada
     const target = document.getElementById(viewId);
     if (target) {
         target.classList.add('active');
@@ -33,26 +31,40 @@ function navigateTo(viewId) {
 
 // --- LÓGICA DE RESERVA ---
 
-// Paso 1: Seleccionar tarjeta (Esto se llama desde el HTML onclick)
-function seleccionarExperiencia(titulo, proveedor, precio, fecha, id) {
-    experienciaSeleccionada = { titulo, proveedor, precio, fecha, id };
+// Paso 1: Seleccionar tarjeta
+function seleccionarExperiencia(titulo, proveedor, precio, fecha, descripcion, cupo, id) {
+    experienciaSeleccionada = { titulo, proveedor, precio, fecha, descripcion, cupo, id };
 
-    // Llenar vista detalle con los datos recibidos
     document.getElementById('detail-title').innerText = titulo;
     document.getElementById('detail-provider').innerText = 'Por ' + proveedor;
     document.getElementById('detail-price').innerText = '$' + precio;
+    document.getElementById('detail-description').innerText = descripcion;
+    document.getElementById('detail-space').innerText = cupo;
 
     navigateTo('detalle-view');
 }
 
-// Renderiza las experiencias desde el servidor
+// Renderiza las experiencias desde el servidor, con filtros
 async function renderExperienciasList() {
     const grid = document.querySelector('.experiences-grid');
     if (!grid) return;
     grid.innerHTML = '';
 
+    const switchLocal = document.getElementById('switch-local');
+    const filtroUbicacion = document.getElementById('filtro-ubicacion');
+
+    const useLocalFilter = switchLocal?.checked;
+    const ubicacion = filtroUbicacion?.value || '';
+
+    let url = '/api/experiencias';
+    if (useLocalFilter && ubicacion) {
+        const params = new URLSearchParams({ ubicacion });
+        url = `/api/experiencias?${params.toString()}`;
+    }
+    console.log('useLocalFilter:', useLocalFilter, 'ubicacion:', ubicacion, 'url:', url);
+
     try {
-        const res = await fetch('/api/experiencias');
+        const res = await fetch(url);
         if (!res.ok) throw new Error('No se pudo obtener experiencias');
         const experiencias = await res.json();
 
@@ -64,12 +76,23 @@ async function renderExperienciasList() {
         experiencias.forEach(exp => {
             const card = document.createElement('div');
             card.className = 'experience-card';
+
             const precio = exp.precio || 0;
-            const proveedorNombre = (exp.proveedor && exp.proveedor.nombre) || exp.proveedorEmail || 'Proveedor local';
-            const fechaTexto = exp.fecha ? new Date(exp.fecha).toLocaleDateString('es-ES') : '';
+            const proveedorNombre =
+                (exp.proveedor && exp.proveedor.nombre) ||
+                exp.proveedorEmail ||
+                'Proveedor local';
+            const fechaTexto = exp.fecha
+                ? new Date(exp.fecha).toLocaleDateString('es-ES')
+                : '';
+
             card.innerHTML = `
                 <div class="card-image">
-                    <div class="card-emoji">${exp.imagen ? '<img src="'+escapeHtml(exp.imagen)+'" alt="img" style="max-width:64px;max-height:64px;object-fit:cover;">' : '📍'}</div>
+                    <div class="card-emoji">
+                        ${exp.imagen
+                    ? '<img src="' + escapeHtml(exp.imagen) + '" alt="img" style="max-width:64px;max-height:64px;object-fit:cover;">'
+                    : '📍'}
+                    </div>
                     <span class="card-badge">${escapeHtml(exp.ubicacion || '')}</span>
                 </div>
                 <div class="card-content">
@@ -80,7 +103,21 @@ async function renderExperienciasList() {
                     </div>
                 </div>
             `;
-            card.addEventListener('click', () => seleccionarExperiencia(exp.nombre, proveedorNombre, precio, fechaTexto, exp._id || exp.id));
+
+            card.addEventListener('click', () =>
+                seleccionarExperiencia(
+                    exp.nombre,
+                    proveedorNombre,
+                    precio,
+                    fechaTexto,
+                    exp.descripcion || '',
+                    exp.cupo,
+                    exp._id || exp.id
+                )
+            );
+
+
+
             grid.appendChild(card);
         });
     } catch (e) {
@@ -92,7 +129,7 @@ async function renderExperienciasList() {
 function escapeHtml(str) {
     if (!str) return '';
     return String(str).replace(/[&<>"]/g, function (m) {
-        return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[m];
+        return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[m];
     });
 }
 
@@ -108,7 +145,6 @@ function prepararPago() {
     experienciaSeleccionada.total = total;
     experienciaSeleccionada.personas = 1;
 
-    // Llenar vista pago
     document.getElementById('pay-title').innerText = experienciaSeleccionada.titulo;
     document.getElementById('pay-provider').innerText = 'Por ' + experienciaSeleccionada.proveedor;
     document.getElementById('pay-total').innerText = '$' + total;
@@ -117,7 +153,7 @@ function prepararPago() {
     navigateTo('pago-view');
 }
 
-// Paso 3: Procesar pago y guardar en Base de Datos
+// Paso 3: Procesar pago
 async function procesarPago() {
     validarSesion();
     if (!experienciaSeleccionada || !experienciaSeleccionada.id) {
@@ -128,6 +164,7 @@ async function procesarPago() {
 
     const datosPago = {
         usuarioEmail: usuarioActualEmail,
+        experienciaId: experienciaSeleccionada.id,
         propietario: document.getElementById('propietario-text').value,
         tarjeta: document.getElementById('tarjeta-text').value,
         cvv: document.getElementById('cvv-pass').value,
@@ -145,8 +182,7 @@ async function procesarPago() {
         const data = await res.json();
 
         if (data.success) {
-            // Mostrar ID de reserva y navegar a confirmación
-            if (data.reservaId) document.getElementById('conf-id').innerText = data.reservaId;
+            document.getElementById('conf-id').innerText = data.reservaId;
             navigateTo('confirmacion-view');
         } else {
             alert('Error al reservar: ' + data.message);
@@ -157,46 +193,24 @@ async function procesarPago() {
     }
 }
 
-// Mostrar las reservaciones del usuario
-async function renderMisReservasList() {
-    const container = document.getElementById('reservas-list');
-    if (!container) return;
-    container.innerHTML = '<p>Cargando reservaciones...</p>';
-
-    try {
-        const res = await fetch(`/api/reservaciones?usuarioEmail=${encodeURIComponent(usuarioActualEmail)}`);
-        if (!res.ok) throw new Error('Error obteniendo reservaciones');
-        const reservas = await res.json();
-        if (!Array.isArray(reservas) || reservas.length === 0) {
-            container.innerHTML = '<p>No tienes reservaciones.</p>';
-            return;
-        }
-
-        container.innerHTML = '';
-        reservas.forEach(r => {
-            const card = document.createElement('div');
-            card.className = 'reservation-card';
-            const exp = r.experiencia || {};
-            const fechaExp = exp.fecha ? new Date(exp.fecha).toLocaleDateString('es-ES') : '';
-            card.innerHTML = `
-                <h4>${escapeHtml(exp.nombre || '—')}</h4>
-                <p>${escapeHtml(exp.ubicacion || '')} • ${fechaExp}</p>
-                <p><strong>Total:</strong> $${r.total}</p>
-                <p><strong>Estado:</strong> ${escapeHtml(r.status)}</p>
-                <p><small>ID Reserva: ${r._id}</small></p>
-            `;
-            container.appendChild(card);
-        });
-    } catch (e) {
-        console.error(e);
-        container.innerHTML = '<p>Error cargando reservaciones.</p>';
-    }
-}
-
-
-// Inicializar
 document.addEventListener('DOMContentLoaded', () => {
-    // Al cargar la página, mandamos al login
     renderExperienciasList();
     navigateTo('experiencias-view');
+
+    const switchLocal = document.getElementById('switch-local');
+    const filtroUbicacion = document.getElementById('filtro-ubicacion');
+
+    if (switchLocal) {
+        switchLocal.addEventListener('change', () => {
+            console.log('switch-local checked:', switchLocal.checked);
+            renderExperienciasList();
+        });
+    }
+
+    if (filtroUbicacion) {
+        filtroUbicacion.addEventListener('change', () => {
+            console.log('ubicacion seleccionada:', filtroUbicacion.value);
+            renderExperienciasList();
+        });
+    }
 });
