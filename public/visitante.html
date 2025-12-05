@@ -23,19 +23,18 @@
             <div class="hero-section">
                 <h1>Explora Experiencias</h1>
                 <p>Selecciona una actividad para ver detalles</p>
-                <div class="filters-row">
-                    <h5>Buscar Experiencias Locales</h5>
-                    <input type="checkbox" id="switch-local">
-
-                    <select id="filtro-ubicacion">
-                        <option value="">Todas</option>
-                        <option value="CDMX">CDMX</option>
-                        <option value="Guadalajara">Guadalajara</option>
-                    </select>
+                
+                <div class="search-bar-container" style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); margin-top: 24px; display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; align-items: center;">
+                    
+                    <input type="text" id="filtro-texto" placeholder="🔍 Buscar experiencia..." 
+                           style="padding: 10px; border: 1px solid #ddd; border-radius: 6px; flex: 1; min-width: 200px;">
+                
+                    <button id="btn-buscar" class="btn-primary" style="padding: 10px 20px;">Buscar</button>
+                    <button class="btn-secondary" onclick="limpiarFiltros()" style="padding: 10px 20px;">Ver Todo</button>
                 </div>
-            </div>
+                </div>
             <div class="experiences-grid">
-            </div>
+                </div>
         </div>
     </div>
 
@@ -61,7 +60,7 @@
             <div class="detail-content">
                 <div class="detail-main">
                     <section class="detail-section">
-                        <h2>Cupo</h2>
+                        <h2>Cupo Disponible</h2>
                         <p id="detail-space">n</p>
                         <h2>Descripción</h2>
                         <p id="detail-description">Disfruta de una experiencia inolvidable con los mejores anfitriones locales.</p>
@@ -144,11 +143,11 @@
         </nav>
         <div class="content-wrapper">
             <h2>Mis reservaciones</h2>
-            <div id="reservas-list" class="reservas-list">
-                <!-- Reservas renderizadas por JS -->
-            </div>
+            <div id="mis-reservas-list" class="reservas-list" style="display: grid; gap: 20px; margin-top: 20px;">
+                </div>
         </div>
     </div>
+
     <script src="js/visitante.js"></script>
 </body>
 
